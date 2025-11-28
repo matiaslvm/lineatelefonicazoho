@@ -2,33 +2,53 @@ import React, { useState, useEffect } from 'react';
 import './SolicitudForm.css';
 
 /**
- * Componente para crear una solicitud a partir de la disponibilidad detectada
+ * Componente para crear una solicitud usando campos reales del CRM
+ * Campos: Tipo_de_solicitud, Prioridad, Comentarios, Area, Linea
  */
 function SolicitudForm({
   selectedProject,
   projectStats,
   availabilityStatus,
+  lineasDisponibles = [],
+  tipoSolicitudOptions = [],
+  prioridadOptions = [],
+  areaOptions = [],
   onSubmit,
   onCancel,
   loading
 }) {
   const [formData, setFormData] = useState({
-    tipo: '',
-    descripcion: '',
-    prioridad: 'media'
+    Tipo_de_solicitud: '',
+    Prioridad: '',
+    Comentarios: '',
+    Area: '',
+    Linea: ''
   });
 
   useEffect(() => {
-    if (availabilityStatus === 'available') {
-      setFormData((prev) => ({ ...prev, tipo: 'asignacion' }));
-    } else if (availabilityStatus === 'unavailable') {
-      setFormData((prev) => ({ ...prev, tipo: 'nueva_linea' }));
+    // Pre-seleccionar tipo según disponibilidad
+    if (availabilityStatus === 'available' && tipoSolicitudOptions.length > 0) {
+      // Buscar opción que contenga "asignación" o similar
+      const asignacionOption = tipoSolicitudOptions.find(opt => 
+        opt.label.toLowerCase().includes('asign') || opt.value.toLowerCase().includes('asign')
+      );
+      if (asignacionOption) {
+        setFormData(prev => ({ ...prev, Tipo_de_solicitud: asignacionOption.value }));
+      }
+    } else if (availabilityStatus === 'unavailable' && tipoSolicitudOptions.length > 0) {
+      // Buscar opción que contenga "nueva" o similar
+      const nuevaOption = tipoSolicitudOptions.find(opt => 
+        opt.label.toLowerCase().includes('nueva') || opt.value.toLowerCase().includes('nueva')
+      );
+      if (nuevaOption) {
+        setFormData(prev => ({ ...prev, Tipo_de_solicitud: nuevaOption.value }));
+      }
     }
-  }, [availabilityStatus]);
+  }, [availabilityStatus, tipoSolicitudOptions]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -39,12 +59,7 @@ function SolicitudForm({
     if (onSubmit) {
       onSubmit({
         ...formData,
-        proyectoOrigen: selectedProject,
-        disponibilidad: availabilityStatus,
-        resumen: {
-          total: projectStats?.total || 0,
-          disponibles: projectStats?.disponibles || 0
-        }
+        proyectoOrigen: selectedProject
       });
     }
   };
@@ -53,6 +68,12 @@ function SolicitudForm({
     availabilityStatus === 'available'
       ? `Hay ${projectStats?.disponibles || 0} líneas disponibles para este proyecto.`
       : 'No hay líneas disponibles actualmente, se solicitará una nueva línea.';
+
+  const isFormValid = formData.Tipo_de_solicitud && formData.Comentarios;
+  
+  // Si hay líneas disponibles, también requiere seleccionar una línea
+  const isLineaRequired = availabilityStatus === 'available' && lineasDisponibles.length > 0;
+  const isFormComplete = isFormValid && (!isLineaRequired || formData.Linea);
 
   return (
     <div className="solicitud-form-container">
@@ -68,51 +89,100 @@ function SolicitudForm({
 
       <form onSubmit={handleSubmit} className="solicitud-form">
         <div className="form-group">
-          <label htmlFor="tipo" className="form-label">
+          <label htmlFor="Tipo_de_solicitud" className="form-label">
             Tipo de solicitud <span className="required">*</span>
           </label>
           <select
-            id="tipo"
-            name="tipo"
-            value={formData.tipo}
+            id="Tipo_de_solicitud"
+            name="Tipo_de_solicitud"
+            value={formData.Tipo_de_solicitud}
             onChange={handleChange}
             className="form-select"
             required
           >
             <option value="">Seleccioná una opción</option>
-            <option value="asignacion">Asignar línea disponible</option>
-            <option value="nueva_linea">Solicitar nueva línea</option>
-            <option value="incidencia">Reportar incidencia</option>
-            <option value="mantenimiento">Mantenimiento</option>
+            {tipoSolicitudOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
+        {availabilityStatus === 'available' && lineasDisponibles.length > 0 && (
+          <div className="form-group">
+            <label htmlFor="Linea" className="form-label">
+              Número de línea disponible <span className="required">*</span>
+            </label>
+            <select
+              id="Linea"
+              name="Linea"
+              value={formData.Linea}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
+              <option value="">Seleccioná una línea</option>
+              {lineasDisponibles.map((linea) => (
+                <option key={linea.id} value={linea.Linea}>
+                  {linea.Linea || `Línea ID: ${linea.id}`}
+                </option>
+              ))}
+            </select>
+            <p className="helper-text">
+              {lineasDisponibles.length} línea(s) disponible(s) para asignar
+            </p>
+          </div>
+        )}
+
         <div className="form-group">
-          <label htmlFor="prioridad" className="form-label">
+          <label htmlFor="Prioridad" className="form-label">
             Prioridad
           </label>
           <select
-            id="prioridad"
-            name="prioridad"
-            value={formData.prioridad}
+            id="Prioridad"
+            name="Prioridad"
+            value={formData.Prioridad}
             onChange={handleChange}
             className="form-select"
           >
-            <option value="baja">Baja</option>
-            <option value="media">Media</option>
-            <option value="alta">Alta</option>
-            <option value="urgente">Urgente</option>
+            <option value="">Seleccioná una opción</option>
+            {prioridadOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
 
         <div className="form-group">
-          <label htmlFor="descripcion" className="form-label">
-            Descripción <span className="required">*</span>
+          <label htmlFor="Area" className="form-label">
+            Área solicitante
+          </label>
+          <select
+            id="Area"
+            name="Area"
+            value={formData.Area}
+            onChange={handleChange}
+            className="form-select"
+          >
+            <option value="">Seleccioná una opción</option>
+            {areaOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="Comentarios" className="form-label">
+            Comentarios adicionales <span className="required">*</span>
           </label>
           <textarea
-            id="descripcion"
-            name="descripcion"
-            value={formData.descripcion}
+            id="Comentarios"
+            name="Comentarios"
+            value={formData.Comentarios}
             onChange={handleChange}
             className="form-textarea"
             rows="4"
@@ -133,7 +203,7 @@ function SolicitudForm({
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading || !formData.tipo || !formData.descripcion}
+            disabled={loading || !isFormComplete}
           >
             {loading ? 'Creando...' : 'Crear Solicitud'}
           </button>
@@ -144,4 +214,3 @@ function SolicitudForm({
 }
 
 export default SolicitudForm;
-

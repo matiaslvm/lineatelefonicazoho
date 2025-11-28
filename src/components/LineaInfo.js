@@ -80,15 +80,19 @@ function LineaInfo({
           onChange={handleSelect}
           disabled={loadingProjects}
         >
+          <option value="">-None-</option>
           {projectOptions.map((option) => (
             <option
-              key={option.value}
-              value={option.value}
+              key={option.value || option.id || option.actual_value || option.display_value}
+              value={option.value || option.actual_value || option.display_value}
             >
-              {option.label}
+              {option.label || option.display_value}
             </option>
           ))}
         </select>
+        {loadingProjects && (
+          <p className="helper-text">Cargando proyectos...</p>
+        )}
       </div>
 
       {error && (
@@ -103,4 +107,3 @@ function LineaInfo({
 }
 
 export default LineaInfo;
-
