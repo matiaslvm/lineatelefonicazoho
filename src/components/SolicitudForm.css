@@ -1,0 +1,137 @@
+.solicitud-form-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 12px 36px rgba(7, 4, 38, 0.12);
+  border: 1px solid #f1f1f6;
+}
+
+.form-header {
+  margin-bottom: 24px;
+}
+
+.form-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0b1957;
+}
+
+.form-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #6f7287;
+}
+
+.availability-chip {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.availability-chip.available {
+  background: #e3f6ef;
+  color: #0d5c3d;
+  border: 1px solid #a8dec6;
+}
+
+.availability-chip.unavailable {
+  background: #fff2e5;
+  color: #8a3c00;
+  border: 1px solid #ffd9b0;
+}
+
+.solicitud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #23263b;
+  font-size: 14px;
+}
+
+.required {
+  color: #c62828;
+}
+
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d7d9e4;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  background: #f8f9ff;
+}
+
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #5d5fef;
+  box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.15);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 120px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #5d5fef, #7a62ff);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 20px rgba(93, 95, 239, 0.3);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #5d5fef;
+  border: 1px solid #cfd1ff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: rgba(93, 95, 239, 0.08);
+}
+

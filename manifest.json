@@ -1,0 +1,13 @@
+{
+  "name": "Gestion Lineas Telefonicas",
+  "description": "Widget para gestionar incidencias y solicitudes en líneas telefónicas",
+  "version": "1.0.0",
+  "widget_type": "button",
+  "location": "list_menu_utilities",
+  "module": "L_neas_telef_nicas",
+  "permissions": [
+    "ZohoCRM.modules.ALL"
+  ],
+  "entry_point": "index.html"
+}
+

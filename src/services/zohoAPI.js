@@ -1,0 +1,207 @@
+/**
+ * Servicio para interactuar con las APIs de Zoho CRM
+ * Basado en la documentación oficial: https://help.zwidgets.com/help/latest/index.html
+ */
+
+/**
+ * Obtiene un registro específico del módulo
+ * @param {string} module - Nombre del módulo (API name)
+ * @param {string} recordId - ID del registro
+ * @returns {Promise} - Promesa con los datos del registro
+ */
+export function getRecord(module, recordId) {
+  return new Promise((resolve, reject) => {
+    if (!window.ZOHO || !window.ZOHO.CRM || !window.ZOHO.CRM.API) {
+      reject(new Error('Zoho SDK no está disponible'));
+      return;
+    }
+
+    window.ZOHO.CRM.API.getRecord({
+      Entity: module,
+      RecordID: recordId
+    })
+      .then((response) => {
+        if (response.data && response.data.length > 0) {
+          resolve(response.data[0]);
+        } else {
+          reject(new Error('No se encontró el registro'));
+        }
+      })
+      .catch((error) => {
+        console.error('Error al obtener registro:', error);
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Obtiene los valores únicos de un campo (ej. picklist) usando getAllRecords
+ * @param {string} module - Nombre del módulo (API name)
+ * @param {string} fieldApiName - Nombre del campo (API name)
+ * @returns {Promise<Array<{value:string,label:string}>>}
+ */
+export async function getPicklistValues(module, fieldApiName) {
+  // Usamos únicamente APIs documentadas en el SDK: ZOHO.CRM.API.getAllRecords
+  const records = await getAllRecords(module, { per_page: 200 });
+
+  const unique = new Map();
+  records.forEach((rec) => {
+    const val = rec[fieldApiName];
+    if (val && !unique.has(val)) {
+      unique.set(val, { value: val, label: val });
+    }
+  });
+
+  return Array.from(unique.values());
+}
+
+/**
+ * Obtiene todos los registros de un módulo con filtros opcionales
+ * @param {string} module - Nombre del módulo (API name)
+ * @param {object} params - Parámetros opcionales (page, per_page, criteria, etc.)
+ * @returns {Promise} - Promesa con los datos de los registros
+ */
+export function getAllRecords(module, params = {}) {
+  return new Promise((resolve, reject) => {
+    if (!window.ZOHO || !window.ZOHO.CRM || !window.ZOHO.CRM.API) {
+      reject(new Error('Zoho SDK no está disponible'));
+      return;
+    }
+
+    const options = {
+      Entity: module,
+      ...params
+    };
+
+    window.ZOHO.CRM.API.getAllRecords(options)
+      .then((response) => {
+        resolve(response.data || []);
+      })
+      .catch((error) => {
+        console.error('Error al obtener registros:', error);
+        reject(error);
+      });
+  });
+}
+
+// Nota: dejamos getRecordsByCriteria por si se necesita a futuro, pero
+// para disponibilidad usamos filtrado en frontend para evitar errores de sintaxis.
+export function getRecordsByCriteria(module, criteria, params = {}) {
+  return getAllRecords(module, params);
+}
+/**
+ * Calcula indicadores de disponibilidad de líneas para un proyecto dado
+ * @param {string} module - Nombre del módulo
+ * @param {string} projectValue - Valor seleccionado del picklist Proyecto_Origen
+ * @returns {Promise<{total:number, disponibles:number, registros:Array}>}
+ */
+export async function getProjectAvailability(module, projectValue) {
+  // Traemos registros y filtramos en frontend para no depender de sintaxis de criteria
+  const records = await getAllRecords(module, { per_page: 200 });
+
+  const filtered = records.filter(
+    (record) => record.Proyecto_Origen === projectValue
+  );
+
+  const total = filtered.length;
+  const disponibles = filtered.filter(
+    (record) =>
+      (record.Estado || '').toLowerCase() === 'disponible' ||
+      (record.estado || '').toLowerCase() === 'disponible'
+  ).length;
+
+  return {
+    total,
+    disponibles,
+    registros: filtered
+  };
+}
+
+/**
+ * Crea un nuevo registro en el módulo especificado
+ * @param {string} module - Nombre del módulo (API name)
+ * @param {object} recordData - Datos del registro a crear
+ * @returns {Promise} - Promesa con el resultado de la creación
+ */
+export function insertRecord(module, recordData) {
+  return new Promise((resolve, reject) => {
+    if (!window.ZOHO || !window.ZOHO.CRM || !window.ZOHO.CRM.API) {
+      reject(new Error('Zoho SDK no está disponible'));
+      return;
+    }
+
+    const apiData = {
+      data: [recordData]
+    };
+
+    window.ZOHO.CRM.API.insertRecord({
+      Entity: module,
+      APIData: apiData
+    })
+      .then((response) => {
+        if (response.data && response.data.length > 0) {
+          resolve(response.data[0]);
+        } else {
+          reject(new Error('No se pudo crear el registro'));
+        }
+      })
+      .catch((error) => {
+        console.error('Error al crear registro:', error);
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Actualiza un registro existente
+ * @param {string} module - Nombre del módulo (API name)
+ * @param {string} recordId - ID del registro a actualizar
+ * @param {object} recordData - Datos a actualizar
+ * @returns {Promise} - Promesa con el resultado de la actualización
+ */
+export function updateRecord(module, recordId, recordData) {
+  return new Promise((resolve, reject) => {
+    if (!window.ZOHO || !window.ZOHO.CRM || !window.ZOHO.CRM.API) {
+      reject(new Error('Zoho SDK no está disponible'));
+      return;
+    }
+
+    const apiData = {
+      data: [recordData]
+    };
+
+    window.ZOHO.CRM.API.updateRecord({
+      Entity: module,
+      RecordID: recordId,
+      APIData: apiData
+    })
+      .then((response) => {
+        if (response.data && response.data.length > 0) {
+          resolve(response.data[0]);
+        } else {
+          reject(new Error('No se pudo actualizar el registro'));
+        }
+      })
+      .catch((error) => {
+        console.error('Error al actualizar registro:', error);
+        reject(error);
+      });
+  });
+}
+
+/**
+ * Muestra una notificación nativa de Zoho CRM
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - Tipo de notificación (success, error, info)
+ */
+export function showNotification(message, type = 'info') {
+  if (window.ZOHO && window.ZOHO.CRM && window.ZOHO.CRM.UI) {
+    window.ZOHO.CRM.UI.Popup.showSuccessToast({
+      message: message
+    });
+  } else {
+    // Fallback si el SDK no está disponible
+    alert(message);
+  }
+}
+
