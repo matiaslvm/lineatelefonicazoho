@@ -67,7 +67,7 @@ function SolicitudForm({
   const availabilityMessage =
     availabilityStatus === 'available'
       ? `Hay ${projectStats?.disponibles || 0} líneas disponibles para este proyecto.`
-      : 'No hay líneas disponibles actualmente, se solicitará una nueva línea.';
+      : 'No hay líneas disponibles, se solicitará una nueva línea.';
 
   const isFormValid = formData.Tipo_de_solicitud && formData.Comentarios && formData.Name;
   
@@ -79,18 +79,20 @@ function SolicitudForm({
     <div className="solicitud-form-container">
       {/* Banner de tipo de solicitud */}
       <div className={`solicitud-type-banner ${solicitudType}`}>
-        <div className="solicitud-type-icon">
-          {isLineaExistente ? '📞' : '➕'}
-        </div>
-        <div className="solicitud-type-content">
-          <h3 className="solicitud-type-title">
-            {isLineaExistente ? 'Asignar Línea Existente' : 'Solicitar Nueva Línea'}
-          </h3>
-          <p className="solicitud-type-description">
-            {isLineaExistente 
-              ? 'Vas a asignar una línea telefónica disponible a un nuevo propietario.'
-              : 'Vas a crear una solicitud para obtener una nueva línea telefónica.'}
-          </p>
+        <div className="solicitud-type-main">
+          <div className="solicitud-type-icon">
+            {isLineaExistente ? '📞' : '➕'}
+          </div>
+          <div className="solicitud-type-content">
+            <h3 className="solicitud-type-title">
+              {isLineaExistente ? 'Asignar Línea Existente' : 'Solicitar Nueva Línea'}
+            </h3>
+            <p className="solicitud-type-description">
+              {isLineaExistente 
+                ? 'Asigná una línea disponible a un nuevo propietario.'
+                : 'Creá una solicitud para obtener una nueva línea telefónica.'}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -98,9 +100,6 @@ function SolicitudForm({
         <p className="form-subtitle">
           Proyecto seleccionado: <strong>{selectedProject || '-'}</strong>
         </p>
-        <div className={`availability-chip ${availabilityStatus}`}>
-          {availabilityMessage}
-        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="solicitud-form">
@@ -127,10 +126,6 @@ function SolicitudForm({
 
         {availabilityStatus === 'available' && lineasDisponibles.length > 0 && (
           <div className="form-group linea-existente-group">
-            <label htmlFor="Linea" className="form-label">
-              <span className="label-icon">📞</span>
-              Seleccionar línea disponible <span className="required">*</span>
-            </label>
             <select
               id="Linea"
               name="Linea"
@@ -139,7 +134,9 @@ function SolicitudForm({
               className="form-select"
               required
             >
-              <option value="">Seleccioná una línea disponible</option>
+              <option value="">
+                Seleccioná una línea disponible ({lineasDisponibles.length} para asignar)
+              </option>
               {lineasDisponibles.map((linea) => (
                 <option key={linea.id} value={linea.id}>
                   {linea.Linea || `Línea ID: ${linea.id}`}

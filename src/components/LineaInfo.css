@@ -96,10 +96,10 @@
 }
 
 .availability-banner {
-  margin-top: 20px;
-  padding: 16px 20px;
-  border-radius: 12px;
-  font-size: 14px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 12px;

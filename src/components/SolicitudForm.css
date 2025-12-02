@@ -1,7 +1,7 @@
 .solicitud-form-container {
   background: #ffffff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 12px 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 100%;
@@ -11,11 +11,12 @@
 /* Banner de tipo de solicitud */
 .solicitud-type-banner {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
   border-radius: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   border-left: 4px solid;
   animation: slideIn 0.3s ease-out;
   flex-shrink: 0;
@@ -32,7 +33,7 @@
 }
 
 .solicitud-type-icon {
-  font-size: 32px;
+  font-size: 26px;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -41,9 +42,15 @@
   flex: 1;
 }
 
+.solicitud-type-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .solicitud-type-title {
-  margin: 0 0 6px 0;
-  font-size: 18px;
+  margin: 0 0 4px 0;
+  font-size: 16px;
   font-weight: 600;
   color: #1a1a1a;
 }
@@ -58,13 +65,13 @@
 
 .solicitud-type-description {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   color: #555;
   line-height: 1.5;
 }
 
 .form-header {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   flex-shrink: 0;
 }
 
@@ -84,7 +91,7 @@
 .solicitud-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
   flex: 1;
   min-height: 0;
 }
@@ -99,7 +106,7 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .form-label {
@@ -122,7 +129,7 @@
 /* Grupos de formulario diferenciados */
 .linea-existente-group {
   background: #f3f9ff;
-  padding: 16px;
+  padding: 10px 10px 8px;
   border-radius: 8px;
   border: 1px solid #e3f2fd;
 }
@@ -144,9 +151,10 @@
   color: #1565c0;
   font-weight: 500;
   background: #e3f2fd;
-  padding: 8px 12px;
+  padding: 4px 10px;
   border-radius: 6px;
   display: inline-block;
+  font-size: 12px;
 }
 
 .form-select,
@@ -181,16 +189,27 @@
 
 .form-textarea {
   resize: vertical;
-  min-height: 80px;
-  max-height: 150px;
+  min-height: 60px;
+  max-height: 110px;
+}
+
+/* Compactar aún más el formulario en pantallas grandes para evitar scroll al asignar línea */
+@media (min-width: 1400px) {
+  .solicitud-form {
+    gap: 14px;
+  }
+
+  .form-row {
+    gap: 18px;
+  }
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 8px;
-  padding-top: 20px;
+  margin-top: 4px;
+  padding-top: 12px;
   border-top: 1px solid #f0f0f0;
 }
 
@@ -248,8 +267,14 @@
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
-  margin-top: 12px;
   font-weight: 500;
+}
+
+.availability-chip-inline {
+  margin-top: 0;
+  font-size: 12px;
+  padding: 6px 10px;
+  white-space: nowrap;
 }
 
 .availability-chip.available {

@@ -46,24 +46,15 @@ function LineaInfo({
 
         <div className={`availability-banner ${availabilityStatus}`}>
           {availabilityStatus === 'available' ? (
-            <div>
-              <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>
-                ✓ Líneas disponibles encontradas
-              </p>
-              <p style={{ margin: 0 }}>
-                Hay <strong>{projectStats.disponibles}</strong> línea(s) disponible(s) para el proyecto seleccionado.
-                Podés <strong>asignar una línea existente</strong> a un nuevo propietario.
-              </p>
-            </div>
+            <p style={{ margin: 0 }}>
+              ✓ Hay <strong>{projectStats.disponibles}</strong> línea(s) disponibles. Podés{' '}
+              <strong>asignar una línea existente</strong>.
+            </p>
           ) : (
-            <div>
-              <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>
-                ⚠ No hay líneas disponibles
-              </p>
-              <p style={{ margin: 0 }}>
-                No hay líneas disponibles para este proyecto. Generá una <strong>solicitud para pedir una nueva línea</strong> telefónica.
-              </p>
-            </div>
+            <p style={{ margin: 0 }}>
+              ⚠ No hay líneas disponibles para este proyecto. Creá una{' '}
+              <strong>solicitud para pedir una nueva línea</strong>.
+            </p>
           )}
         </div>
       </>
