@@ -13,38 +13,35 @@ function SolicitudForm({
   tipoSolicitudOptions = [],
   prioridadOptions = [],
   areaOptions = [],
+  planOptions = [],
   onSubmit,
   onCancel,
   loading
 }) {
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     Tipo_de_solicitud: '',
     Prioridad: '',
     Comentarios: '',
     Area: '',
+    Plan: '',
+    Name: '',
     Linea: ''
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormState);
+
+  // Cada vez que cambia el proyecto o la disponibilidad, reseteamos el formulario
   useEffect(() => {
-    // Pre-seleccionar tipo según disponibilidad
-    if (availabilityStatus === 'available' && tipoSolicitudOptions.length > 0) {
-      // Buscar opción que contenga "asignación" o similar
-      const asignacionOption = tipoSolicitudOptions.find(opt => 
-        opt.label.toLowerCase().includes('asign') || opt.value.toLowerCase().includes('asign')
-      );
-      if (asignacionOption) {
-        setFormData(prev => ({ ...prev, Tipo_de_solicitud: asignacionOption.value }));
-      }
-    } else if (availabilityStatus === 'unavailable' && tipoSolicitudOptions.length > 0) {
-      // Buscar opción que contenga "nueva" o similar
-      const nuevaOption = tipoSolicitudOptions.find(opt => 
-        opt.label.toLowerCase().includes('nueva') || opt.value.toLowerCase().includes('nueva')
-      );
-      if (nuevaOption) {
-        setFormData(prev => ({ ...prev, Tipo_de_solicitud: nuevaOption.value }));
-      }
-    }
-  }, [availabilityStatus, tipoSolicitudOptions]);
+    setFormData({
+      Tipo_de_solicitud: '',
+      Prioridad: '',
+      Comentarios: '',
+      Area: '',
+      Plan: '',
+      Name: '',
+      Linea: ''
+    });
+  }, [selectedProject, availabilityStatus]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,12 +61,15 @@ function SolicitudForm({
     }
   };
 
+  const isLineaExistente = availabilityStatus === 'available' && lineasDisponibles.length > 0;
+  const solicitudType = isLineaExistente ? 'existente' : 'nueva';
+
   const availabilityMessage =
     availabilityStatus === 'available'
       ? `Hay ${projectStats?.disponibles || 0} líneas disponibles para este proyecto.`
       : 'No hay líneas disponibles actualmente, se solicitará una nueva línea.';
 
-  const isFormValid = formData.Tipo_de_solicitud && formData.Comentarios;
+  const isFormValid = formData.Tipo_de_solicitud && formData.Comentarios && formData.Name;
   
   // Si hay líneas disponibles, también requiere seleccionar una línea
   const isLineaRequired = availabilityStatus === 'available' && lineasDisponibles.length > 0;
@@ -77,8 +77,24 @@ function SolicitudForm({
 
   return (
     <div className="solicitud-form-container">
+      {/* Banner de tipo de solicitud */}
+      <div className={`solicitud-type-banner ${solicitudType}`}>
+        <div className="solicitud-type-icon">
+          {isLineaExistente ? '📞' : '➕'}
+        </div>
+        <div className="solicitud-type-content">
+          <h3 className="solicitud-type-title">
+            {isLineaExistente ? 'Asignar Línea Existente' : 'Solicitar Nueva Línea'}
+          </h3>
+          <p className="solicitud-type-description">
+            {isLineaExistente 
+              ? 'Vas a asignar una línea telefónica disponible a un nuevo propietario.'
+              : 'Vas a crear una solicitud para obtener una nueva línea telefónica.'}
+          </p>
+        </div>
+      </div>
+
       <div className="form-header">
-        <h2>Nueva Solicitud</h2>
         <p className="form-subtitle">
           Proyecto seleccionado: <strong>{selectedProject || '-'}</strong>
         </p>
@@ -110,9 +126,10 @@ function SolicitudForm({
         </div>
 
         {availabilityStatus === 'available' && lineasDisponibles.length > 0 && (
-          <div className="form-group">
+          <div className="form-group linea-existente-group">
             <label htmlFor="Linea" className="form-label">
-              Número de línea disponible <span className="required">*</span>
+              <span className="label-icon">📞</span>
+              Seleccionar línea disponible <span className="required">*</span>
             </label>
             <select
               id="Linea"
@@ -122,57 +139,100 @@ function SolicitudForm({
               className="form-select"
               required
             >
-              <option value="">Seleccioná una línea</option>
+              <option value="">Seleccioná una línea disponible</option>
               {lineasDisponibles.map((linea) => (
-                <option key={linea.id} value={linea.Linea}>
+                <option key={linea.id} value={linea.id}>
                   {linea.Linea || `Línea ID: ${linea.id}`}
                 </option>
               ))}
             </select>
-            <p className="helper-text">
-              {lineasDisponibles.length} línea(s) disponible(s) para asignar
+            <p className="helper-text highlight-text">
+              ✓ {lineasDisponibles.length} línea(s) disponible(s) para asignar
             </p>
           </div>
         )}
 
-        <div className="form-group">
-          <label htmlFor="Prioridad" className="form-label">
-            Prioridad
-          </label>
-          <select
-            id="Prioridad"
-            name="Prioridad"
-            value={formData.Prioridad}
-            onChange={handleChange}
-            className="form-select"
-          >
-            <option value="">Seleccioná una opción</option>
-            {prioridadOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="Prioridad" className="form-label">
+              Prioridad
+            </label>
+            <select
+              id="Prioridad"
+              name="Prioridad"
+              value={formData.Prioridad}
+              onChange={handleChange}
+              className="form-select"
+            >
+              <option value="">Seleccioná una opción</option>
+              {prioridadOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="Area" className="form-label">
+              Área solicitante
+            </label>
+            <select
+              id="Area"
+              name="Area"
+              value={formData.Area}
+              onChange={handleChange}
+              className="form-select"
+            >
+              <option value="">Seleccioná una opción</option>
+              {areaOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="Area" className="form-label">
-            Área solicitante
-          </label>
-          <select
-            id="Area"
-            name="Area"
-            value={formData.Area}
-            onChange={handleChange}
-            className="form-select"
-          >
-            <option value="">Seleccioná una opción</option>
-            {areaOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="Name" className="form-label">
+              Propietario de línea <span className="required">*</span>
+            </label>
+            <input
+              id="Name"
+              name="Name"
+              type="text"
+              value={formData.Name}
+              onChange={handleChange}
+              className="form-select"
+              placeholder="Ingresá el nombre del propietario de la línea"
+              required
+            />
+          </div>
+
+          {availabilityStatus !== 'available' && (
+            <div className="form-group">
+              <label htmlFor="Plan" className="form-label">
+                <span className="label-icon">📋</span>
+                Plan para nueva línea
+              </label>
+              <select
+                id="Plan"
+                name="Plan"
+                value={formData.Plan}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Seleccioná un plan</option>
+                {planOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <div className="form-group">
@@ -202,10 +262,12 @@ function SolicitudForm({
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className={`btn btn-primary ${solicitudType}`}
             disabled={loading || !isFormComplete}
           >
-            {loading ? 'Creando...' : 'Crear Solicitud'}
+            {loading 
+              ? (isLineaExistente ? 'Asignando...' : 'Creando...') 
+              : (isLineaExistente ? 'Asignar Línea' : 'Crear Solicitud de Nueva Línea')}
           </button>
         </div>
       </form>

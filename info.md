@@ -38,6 +38,7 @@ URL; https://help.zwidgets.com/help/latest/index.html
 #### 4. ZOHO.CRM.UI
 - **`Popup.showSuccessToast({ message })`**: Mostrar notificación de éxito
 - **`Popup.showErrorToast({ message })`**: Mostrar notificación de error
+- **`Resize({ width, height })`**: Redimensionar el contenedor/modal del widget (acepta valores en px o en `%` del área disponible)
 - Modales nativos, record pickers, etc.
 
 ### Patrones y Mejores Prácticas
@@ -51,6 +52,39 @@ window.ZOHO.embeddedApp.on("PageLoad", function(data) {
 });
 window.ZOHO.embeddedApp.init();
 ```
+
+#### Resize del Widget (tamaño y disposición)
+- **Regla práctica**: el resize debe hacerse **desde el componente principal (por ej. `App`) usando `useEffect`**, no desde `index.js` con lógica propia de tamaños.
+- Usar siempre la API oficial `ZOHO.CRM.UI.Resize` con porcentajes para que Zoho decida el tamaño máximo permitido del modal.
+
+Ejemplo en React (`App.js`):
+
+```javascript
+import { useEffect } from 'react';
+
+function App() {
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.ZOHO &&
+      window.ZOHO.CRM &&
+      window.ZOHO.CRM.UI &&
+      window.ZOHO.CRM.UI.Resize
+    ) {
+      window.ZOHO.CRM.UI.Resize({
+        width: '100%',   // ocupar todo el ancho permitido
+        height: '95%'    // casi todo el alto disponible
+      });
+    }
+  }, []);
+
+  // ...resto del componente
+}
+```
+
+**Errores a evitar (lecciones aprendidas):**
+- No recalcular manualmente `width/height` con `screen.width`, `innerHeight`, etc. salvo casos muy específicos.
+- No mezclar `Resize` con CSS que limite la altura (`max-height`, `overflow` en contenedores raíz), porque el contenido se “corta” aunque el modal crezca.
 
 #### Obtener Valores de Picklist
 **Método 1: Desde registros existentes** (si hay registros con valores)

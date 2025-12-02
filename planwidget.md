@@ -19,9 +19,9 @@
      - Relevancia: validar dónde necesita vivir nuestro widget para saber qué payload inicial entrega `ZOHO.embeddedApp.on("PageLoad")` (registro, módulo, layout).  
      - Entregable: matriz “Contexto del CRM ↔ Datos iniciales ↔ Restricciones UI” extraída de la tabla “Widget Locations” del SDK.  
    - **1.2 Analizar APIs disponibles**  
-     - `ZOHO.embeddedApp` (init, eventos, resize) es obligatorio; confirmar secuencia `init → onLoad`.  
+     - `ZOHO.embeddedApp` (init, eventos) es obligatorio; confirmar secuencia `init → onLoad`.  
      - `ZOHO.CRM.API` (CRUD, search, getAllRecords, upsert) requiere definir scopes como `ZohoCRM.modules.ALL`.  
-     - `ZOHO.CRM.UI` (abrir modales, refrescar vistas, gestionar record select) útil para UX nativa.  
+     - `ZOHO.CRM.UI` (abrir modales, refrescar vistas, gestionar record select, **`Resize` del widget**) útil para UX nativa.  
      - `ZOHO.CRM.CONNECTOR` / `ZOHO.CRM.HTTP` permiten invocar funciones del servidor o conexiones externas aprobadas.  
      - `ZOHO.storage` y `ZOHO.CRM.CONFIG.getCurrentUser` cubren cache y metadata de usuario.  
      - Entregable: tabla con nombre del namespace, métodos clave, scopes/limitaciones y uso previsto en nuestro widget.  
@@ -59,6 +59,7 @@
 5. **Implementación**  
    - Crear bootstrap del widget (carga del SDK, init, autenticación).  
    - Construir componentes UI siguiendo guías de diseño internas.  
+   - En el componente principal (`App`), agregar un `useEffect` que invoque `ZOHO.CRM.UI.Resize({ width: "100%", height: "95%" })` luego del primer render, para que el widget se adapte al espacio disponible sin depender de cálculos manuales de `screen`/`innerWidth`.  
    - Añadir integraciones con APIs de Zoho CRM vía SDK; manejar estados y loaders.  
 
 6. **Testing y validación**  

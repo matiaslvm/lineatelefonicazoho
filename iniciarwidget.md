@@ -9,11 +9,11 @@
 
 #### Objetivo funcional
 - **Problema a resolver**: Gestionar y solventar incidencias en líneas telefónicas
-- **Flujo principal**: 
+- **Flujo principal**:
   - El widget forma parte de un circuito que incluye blueprints
   - Permite realizar solicitudes relacionadas con las incidencias
   - Facilita el seguimiento y resolución de problemas en líneas telefónicas
-- **Acciones principales**: 
+- **Acciones principales**:
   - Crear solicitudes de incidencias
   - Gestionar el flujo de trabajo alrededor de las líneas telefónicas
   - Interactuar con blueprints existentes
@@ -105,6 +105,7 @@ widget/
    - Modales nativos
    - Notificaciones
    - Record pickers
+   - **Resize del widget**: usar `ZOHO.CRM.UI.Resize({ width, height })` desde el componente principal (`App`) en un `useEffect`, con valores en `%` (por ejemplo `width: "100%"`, `height: "95%"`). No hacer cálculos manuales de `screen.width` en `index.js`.
 
 ### 6. Próximos pasos
 

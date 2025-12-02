@@ -42,40 +42,71 @@ export function getRecord(module, recordId) {
  * @returns {Promise<Array<{value:string,label:string}>>}
  */
 export async function getPicklistValues(module, fieldApiName) {
-  // Primero intentamos obtener valores desde registros existentes
-  const records = await getAllRecords(module, { per_page: 200 });
+  // 1) Intentar SIEMPRE primero desde la estructura del módulo (getFields / META.getFields)
+  if (window.ZOHO && window.ZOHO.CRM) {
+    // API.getFields
+    if (window.ZOHO.CRM.API && window.ZOHO.CRM.API.getFields) {
+      try {
+        const fieldsResponse = await window.ZOHO.CRM.API.getFields({ Entity: module });
+        if (fieldsResponse && fieldsResponse.fields) {
+          const field = fieldsResponse.fields.find(
+            (f) =>
+              f.api_name === fieldApiName ||
+              f.api_name === fieldApiName.toLowerCase() ||
+              f.api_name === fieldApiName.toUpperCase()
+          );
+          if (field && field.pick_list_values && field.pick_list_values.length > 0) {
+            const values = field.pick_list_values.filter(
+              (item) =>
+                item.actual_value !== '-None-' &&
+                item.display_value !== '-None-'
+            );
+            return values.map((item) => ({
+              value: item.actual_value || item.display_value,
+              label: item.display_value || item.actual_value
+            }));
+          }
+        }
+      } catch (err) {
+        console.log('API.getFields no disponible o falló:', err);
+      }
+    }
 
-  console.log(`Buscando valores para campo: ${fieldApiName}`);
-  console.log(`Total de registros obtenidos: ${records.length}`);
-  
-  // Buscar el campo con diferentes variaciones de nombre (mayúsculas/minúsculas)
-  const fieldVariations = [
-    fieldApiName,
-    fieldApiName.toLowerCase(),
-    fieldApiName.toUpperCase(),
-    fieldApiName.charAt(0).toUpperCase() + fieldApiName.slice(1).toLowerCase()
-  ];
-
-  const unique = new Map();
-  let foundField = null;
-  
-  // Primero, encontrar qué variación del nombre de campo existe en los registros
-  if (records.length > 0) {
-    const firstRecord = records[0];
-    foundField = fieldVariations.find(field => firstRecord.hasOwnProperty(field));
-    
-    if (foundField) {
-      console.log(`Campo encontrado como: ${foundField}`);
-    } else {
-      console.log('Campo no encontrado. Campos disponibles en el primer registro:', Object.keys(firstRecord));
+    // META.getFields
+    if (window.ZOHO.CRM.META && window.ZOHO.CRM.META.getFields) {
+      try {
+        const metaResponse = await window.ZOHO.CRM.META.getFields({ Entity: module });
+        if (metaResponse && metaResponse.fields) {
+          const field = metaResponse.fields.find(
+            (f) =>
+              f.api_name === fieldApiName ||
+              f.api_name === fieldApiName.toLowerCase() ||
+              f.api_name === fieldApiName.toUpperCase()
+          );
+          if (field && field.pick_list_values && field.pick_list_values.length > 0) {
+            const values = field.pick_list_values.filter(
+              (item) =>
+                item.actual_value !== '-None-' &&
+                item.display_value !== '-None-'
+            );
+            return values.map((item) => ({
+              value: item.actual_value || item.display_value,
+              label: item.display_value || item.actual_value
+            }));
+          }
+        }
+      } catch (err) {
+        console.log('META.getFields no disponible o falló:', err);
+      }
     }
   }
 
+  // 2) Fallback: deducir valores desde registros existentes
+  const records = await getAllRecords(module, { per_page: 200 });
+  const unique = new Map();
+
   records.forEach((rec) => {
-    // Intentar con la variación encontrada o con todas las variaciones
-    const val = foundField ? rec[foundField] : 
-                fieldVariations.reduce((value, field) => value || rec[field], null);
-    
+    const val = rec[fieldApiName];
     if (val && val !== '' && val !== null && val !== undefined) {
       const stringVal = String(val).trim();
       if (stringVal && !unique.has(stringVal)) {
@@ -84,79 +115,7 @@ export async function getPicklistValues(module, fieldApiName) {
     }
   });
 
-  let result = Array.from(unique.values());
-  console.log(`Valores únicos encontrados desde registros para ${fieldApiName}:`, result);
-  
-  // Si no encontramos valores desde registros, intentamos obtener desde la estructura del módulo
-  if (result.length === 0) {
-    console.log(`No se encontraron valores desde registros. Intentando obtener desde estructura del módulo...`);
-    
-    // Método 1: Intentar ZOHO.CRM.API.getFields
-    if (window.ZOHO && window.ZOHO.CRM && window.ZOHO.CRM.API && window.ZOHO.CRM.API.getFields) {
-      try {
-        const fieldsResponse = await new Promise((resolve, reject) => {
-          window.ZOHO.CRM.API.getFields({
-            Entity: module
-          })
-            .then(resolve)
-            .catch(reject);
-        });
-        
-        if (fieldsResponse && fieldsResponse.fields) {
-          const field = fieldsResponse.fields.find(f => 
-            f.api_name === fieldApiName || 
-            f.api_name === fieldApiName.toLowerCase() ||
-            f.api_name === fieldApiName.toUpperCase()
-          );
-          
-          if (field && field.pick_list_values && field.pick_list_values.length > 0) {
-            result = field.pick_list_values.map(item => ({
-              value: item.actual_value || item.display_value,
-              label: item.display_value || item.actual_value
-            }));
-            console.log(`Valores obtenidos desde API.getFields para ${fieldApiName}:`, result);
-            return result;
-          }
-        }
-      } catch (err) {
-        console.log('API.getFields no disponible o falló:', err);
-      }
-    }
-    
-    // Método 2: Intentar ZOHO.CRM.META.getFields (si API.getFields no funcionó)
-    if (result.length === 0 && window.ZOHO && window.ZOHO.CRM && window.ZOHO.CRM.META && window.ZOHO.CRM.META.getFields) {
-      try {
-        const metaResponse = await new Promise((resolve, reject) => {
-          window.ZOHO.CRM.META.getFields({
-            Entity: module
-          })
-            .then(resolve)
-            .catch(reject);
-        });
-        
-        if (metaResponse && metaResponse.fields) {
-          const field = metaResponse.fields.find(f => 
-            f.api_name === fieldApiName || 
-            f.api_name === fieldApiName.toLowerCase() ||
-            f.api_name === fieldApiName.toUpperCase()
-          );
-          
-          if (field && field.pick_list_values && field.pick_list_values.length > 0) {
-            result = field.pick_list_values.map(item => ({
-              value: item.actual_value || item.display_value,
-              label: item.display_value || item.actual_value
-            }));
-            console.log(`Valores obtenidos desde META.getFields para ${fieldApiName}:`, result);
-            return result;
-          }
-        }
-      } catch (err) {
-        console.log('META.getFields no disponible o falló:', err);
-      }
-    }
-  }
-  
-  return result;
+  return Array.from(unique.values());
 }
 
 /**
@@ -239,15 +198,13 @@ export function insertRecord(module, recordData) {
       return;
     }
 
-    const apiData = {
-      data: [recordData]
-    };
-
+    // La JS SDK de widgets espera el body plano (no envuelto en data[])
     window.ZOHO.CRM.API.insertRecord({
       Entity: module,
-      APIData: apiData
+      APIData: recordData
     })
       .then((response) => {
+        console.log('Respuesta insertRecord:', response);
         if (response.data && response.data.length > 0) {
           resolve(response.data[0]);
         } else {
@@ -275,19 +232,22 @@ export function updateRecord(module, recordId, recordData) {
       return;
     }
 
+    // La JS SDK de widgets usa el id dentro del body y no requiere RecordID
     const apiData = {
-      data: [recordData]
+      id: recordId,
+      ...recordData
     };
 
     window.ZOHO.CRM.API.updateRecord({
       Entity: module,
-      RecordID: recordId,
       APIData: apiData
     })
       .then((response) => {
+        console.log('Respuesta updateRecord:', response);
         if (response.data && response.data.length > 0) {
           resolve(response.data[0]);
         } else {
+          console.error('Respuesta inesperada al actualizar registro:', response);
           reject(new Error('No se pudo actualizar el registro'));
         }
       })
@@ -304,10 +264,17 @@ export function updateRecord(module, recordId, recordData) {
  * @param {string} type - Tipo de notificación (success, error, info)
  */
 export function showNotification(message, type = 'info') {
-  if (window.ZOHO && window.ZOHO.CRM && window.ZOHO.CRM.UI) {
-    window.ZOHO.CRM.UI.Popup.showSuccessToast({
-      message: message
-    });
+  if (window.ZOHO && window.ZOHO.CRM && window.ZOHO.CRM.UI && window.ZOHO.CRM.UI.Popup) {
+    // Según la doc de la SDK usamos Popup.show con tipo
+    if (typeof window.ZOHO.CRM.UI.Popup.show === 'function') {
+      window.ZOHO.CRM.UI.Popup.show({
+        type: type === 'error' ? 'error' : 'success',
+        message
+      });
+    } else {
+      // Fallback simple dentro del widget
+      alert(message);
+    }
   } else {
     // Fallback si el SDK no está disponible
     alert(message);
