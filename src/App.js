@@ -23,6 +23,7 @@ const PROJECT_FIELD = 'Proyecto_Origen';
 function App() {
   const [projectOptions, setProjectOptions] = useState([]);
   const [selectedProject, setSelectedProject] = useState('');
+  const [selectedTipoSolicitud, setSelectedTipoSolicitud] = useState('');
   const [projectStats, setProjectStats] = useState(null);
   const [availabilityStatus, setAvailabilityStatus] = useState(null);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -119,6 +120,7 @@ function App() {
       setProjectStats(null);
       setAvailabilityStatus(null);
       setShowForm(false);
+      setSelectedTipoSolicitud('');
     }
   }, [selectedProject]);
 
@@ -144,6 +146,74 @@ function App() {
   };
 
   /**
+   * Calcula qué líneas se pueden seleccionar según el tipo de solicitud
+   */
+  const getLineasParaSeleccion = () => {
+    if (!projectStats || !projectStats.registros) return [];
+
+    const normalizeTipo = (tipo) =>
+      (tipo || '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+
+    const tipo = normalizeTipo(selectedTipoSolicitud);
+    if (!tipo) return [];
+
+    const registros = projectStats.registros;
+
+    const normalizarEstado = (record) =>
+      (record.Estado || record.estado || '').toLowerCase();
+
+    // Asignar línea disponible
+    if (tipo.includes('asignar') && tipo.includes('disponible')) {
+      return projectStats.lineasDisponibles || [];
+    }
+
+    // Reasignar línea
+    if (tipo.includes('reasignar')) {
+      return registros.filter((r) => {
+        const estado = normalizarEstado(r);
+        return estado !== 'disponible' && estado !== 'baja';
+      });
+    }
+
+    // Reportar incidencia
+    if (tipo.includes('incidencia') || tipo.includes('inciden')) {
+      return registros.filter((r) => {
+        const estado = normalizarEstado(r);
+        return estado !== 'baja';
+      });
+    }
+
+    // Mantenimiento
+    if (tipo.includes('mantenimiento')) {
+      return registros.filter((r) => {
+        const estado = normalizarEstado(r);
+        return estado !== 'baja';
+      });
+    }
+
+    // Solicitar baja
+    if (tipo.includes('baja')) {
+      return registros.filter((r) => {
+        const estado = normalizarEstado(r);
+        return estado !== 'baja';
+      });
+    }
+
+    // Solicitar nueva línea (o cualquier otro valor que implique nueva línea)
+    if (tipo.includes('nueva') || tipo.includes('nueva linea') || tipo.includes('nueva línea')) {
+      return [];
+    }
+
+    // Valor no reconocido: por seguridad no mostramos líneas
+    return [];
+  };
+
+  /**
    * Maneja la creación de una solicitud o asignación de línea
    */
   const handleCreateSolicitud = async (formData) => {
@@ -152,75 +222,164 @@ function App() {
       return;
     }
 
+    if (!selectedTipoSolicitud) {
+      showNotification('Seleccioná el tipo de solicitud antes de continuar.', 'error');
+      return;
+    }
+
     try {
       setSubmitting(true);
 
-      // Debug: Verificar valores recibidos
-      console.log('handleCreateSolicitud - formData:', formData);
-      console.log('handleCreateSolicitud - availabilityStatus:', availabilityStatus);
-      console.log('handleCreateSolicitud - projectStats:', projectStats);
+      // Normalizador de estado
+      const normalizarEstado = (estado) => (estado || '').toLowerCase();
 
-      // Determinar si debemos actualizar o crear
-      const hayLineasDisponibles = availabilityStatus === 'available' && 
-                                    projectStats && 
-                                    projectStats.disponibles > 0;
-      const lineaSeleccionada = formData.Linea && formData.Linea.trim() !== '';
+       // Normalizador de tipo de solicitud (para tolerar diferencias de acentos / espacios)
+      const normalizeTipo = (tipo) =>
+        (tipo || '')
+          .toString()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim();
 
-      console.log('hayLineasDisponibles:', hayLineasDisponibles);
-      console.log('lineaSeleccionada:', lineaSeleccionada);
+      const tipoNorm = normalizeTipo(selectedTipoSolicitud);
 
-      // Si hay líneas disponibles Y se seleccionó una línea, ACTUALIZAMOS el registro existente
-      if (hayLineasDisponibles && lineaSeleccionada) {
-        console.log('Modo: ACTUALIZAR registro existente');
-        
-        // Buscar el registro de la línea seleccionada
-        const lineaEncontrada = projectStats.lineasDisponibles.find(
-          linea => linea.id === formData.Linea || linea.id.toString() === formData.Linea.toString()
-        );
+      // Registro de la línea seleccionada (si aplica)
+      const lineaSeleccionada =
+        formData.Linea && projectStats && projectStats.registros
+          ? projectStats.registros.find(
+              (r) => r.id === formData.Linea || String(r.id) === String(formData.Linea)
+            )
+          : null;
 
-        console.log('Línea encontrada para actualizar:', lineaEncontrada);
+      console.log('Tipo de solicitud:', selectedTipoSolicitud);
+      console.log('Línea seleccionada (si existe):', lineaSeleccionada);
 
-        if (!lineaEncontrada) {
-          throw new Error('No se encontró la línea seleccionada en las líneas disponibles');
+      // Asignar línea disponible
+      if (tipoNorm.includes('asignar') && tipoNorm.includes('disponible')) {
+        if (!lineaSeleccionada) {
+          throw new Error('Debés seleccionar una línea disponible para asignar.');
         }
 
-        // Actualizar el registro existente con los datos de la solicitud
+        const estado = normalizarEstado(lineaSeleccionada.Estado || lineaSeleccionada.estado);
+        if (estado !== 'disponible') {
+          throw new Error('La línea seleccionada no está disponible para asignar.');
+        }
+
         const updateData = {
-          Tipo_de_solicitud: formData.Tipo_de_solicitud,
+          Tipo_de_solicitud: selectedTipoSolicitud,
           Prioridad: formData.Prioridad || '',
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
           Plan: formData.Plan || '',
-          Name: formData.Name // Propietario de línea (obligatorio)
-          // El estado lo cambia la automatización, no lo tocamos
+          Name: formData.Name,
+          Empresa_Proveedor: formData.Empresa_Proveedor || ''
         };
 
-        console.log('Actualizando registro ID:', lineaEncontrada.id, 'con datos:', updateData);
-        await updateRecord(MODULE_NAME, lineaEncontrada.id, updateData);
-        setLastRecordId(lineaEncontrada.id);
+        await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
+        setLastRecordId(lineaSeleccionada.id);
         showNotification('Línea asignada exitosamente', 'success');
-      } else {
-        // Crear nuevo registro para solicitud de nueva línea
-        console.log('Modo: CREAR nuevo registro');
-        
+      }
+      // Solicitar nueva línea
+      else if (tipoNorm.includes('nueva') && tipoNorm.includes('linea')) {
         const solicitudData = {
           Proyecto_Origen: selectedProject,
-          Tipo_de_solicitud: formData.Tipo_de_solicitud,
+          Tipo_de_solicitud: selectedTipoSolicitud,
           Prioridad: formData.Prioridad || '',
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
           Plan: formData.Plan || '',
-          Name: formData.Name, // Propietario de línea (obligatorio)
-          Linea: formData.Linea || '' // Puede estar vacío si es nueva línea
+          Name: formData.Name,
+          Empresa_Proveedor: formData.Empresa_Proveedor || '',
+          Linea: formData.Linea || ''
         };
 
-        console.log('Creando nuevo registro con datos:', solicitudData);
         const created = await insertRecord(MODULE_NAME, solicitudData);
         const createdId = created?.details?.id || created?.id;
         if (createdId) {
           setLastRecordId(createdId);
         }
         showNotification('Solicitud creada exitosamente', 'success');
+      }
+      // Reasignar línea
+      else if (tipoNorm.includes('reasignar')) {
+        if (!lineaSeleccionada) {
+          throw new Error('Debés seleccionar una línea para reasignar.');
+        }
+
+        const updateData = {
+          Tipo_de_solicitud: selectedTipoSolicitud,
+          Prioridad: formData.Prioridad || '',
+          Comentarios: formData.Comentarios,
+          Area: formData.Area || '',
+          Name: formData.Name,
+          Motivo_de_reasignaci_n: formData.Motivo_de_reasignaci_n || ''
+        };
+
+        await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
+        setLastRecordId(lineaSeleccionada.id);
+        showNotification('Línea reasignada exitosamente', 'success');
+      }
+      // Reportar incidencia
+      else if (tipoNorm.includes('incidencia') || tipoNorm.includes('inciden')) {
+        if (!lineaSeleccionada) {
+          throw new Error('Debés seleccionar una línea para reportar la incidencia.');
+        }
+
+        const updateData = {
+          Tipo_de_solicitud: selectedTipoSolicitud,
+          Prioridad: formData.Prioridad || '',
+          Comentarios: formData.Comentarios,
+          Area: formData.Area || '',
+          Name: formData.Name
+        };
+
+        await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
+        setLastRecordId(lineaSeleccionada.id);
+        showNotification('Incidencia registrada exitosamente', 'success');
+      }
+      // Mantenimiento
+      else if (tipoNorm.includes('mantenimiento')) {
+        if (!lineaSeleccionada) {
+          throw new Error('Debés seleccionar una línea para registrar mantenimiento.');
+        }
+
+        const updateData = {
+          Tipo_de_solicitud: selectedTipoSolicitud,
+          Prioridad: formData.Prioridad || '',
+          Comentarios: formData.Comentarios,
+          Area: formData.Area || '',
+          Name: formData.Name
+        };
+
+        await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
+        setLastRecordId(lineaSeleccionada.id);
+        showNotification('Mantenimiento registrado exitosamente', 'success');
+      }
+      // Solicitar baja
+      else if (tipoNorm.includes('baja')) {
+        if (!lineaSeleccionada) {
+          throw new Error('Debés seleccionar una línea para solicitar la baja.');
+        }
+
+        const estado = normalizarEstado(lineaSeleccionada.Estado || lineaSeleccionada.estado);
+        if (estado === 'baja') {
+          throw new Error('La línea seleccionada ya se encuentra dada de baja.');
+        }
+
+        const updateData = {
+          Tipo_de_solicitud: selectedTipoSolicitud,
+          Prioridad: formData.Prioridad || '',
+          Comentarios: formData.Comentarios,
+          Area: formData.Area || '',
+          Name: formData.Name
+        };
+
+        await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
+        setLastRecordId(lineaSeleccionada.id);
+        showNotification('Solicitud de baja registrada exitosamente', 'success');
+      } else {
+        throw new Error('Tipo de solicitud no manejado.');
       }
 
       // Recargar estadísticas después de crear/actualizar
@@ -244,6 +403,10 @@ function App() {
 
   const handleProjectChange = (value) => {
     setSelectedProject(value);
+  };
+
+  const handleTipoSolicitudChange = (value) => {
+    setSelectedTipoSolicitud(value);
   };
 
   const handleOpenLastRecord = () => {
@@ -277,6 +440,9 @@ function App() {
               projectOptions={projectOptions}
               selectedProject={selectedProject}
               onProjectChange={handleProjectChange}
+              tipoSolicitudOptions={tipoSolicitudOptions}
+              selectedTipoSolicitud={selectedTipoSolicitud}
+              onTipoSolicitudChange={handleTipoSolicitudChange}
               projectStats={projectStats}
               loadingProjects={loadingProjects}
               loadingStats={loadingStats}
@@ -293,7 +459,8 @@ function App() {
                   selectedProject={selectedProject}
                   projectStats={projectStats}
                   availabilityStatus={availabilityStatus}
-                  lineasDisponibles={projectStats?.lineasDisponibles || []}
+                  selectedTipoSolicitud={selectedTipoSolicitud}
+                  lineasDisponibles={getLineasParaSeleccion()}
                   tipoSolicitudOptions={tipoSolicitudOptions}
                   prioridadOptions={prioridadOptions}
                   areaOptions={areaOptions}

@@ -167,17 +167,25 @@ export async function getProjectAvailability(module, projectValue) {
   );
 
   const total = filtered.length;
-  const lineasDisponibles = filtered.filter(
-    (record) =>
-      (record.Estado || '').toLowerCase() === 'disponible' ||
-      (record.estado || '').toLowerCase() === 'disponible'
-  );
+
+  // Líneas disponibles (Estado = Disponible)
+  const lineasDisponibles = filtered.filter((record) => {
+    const estado = (record.Estado || record.estado || '').toLowerCase();
+    return estado === 'disponible';
+  });
+
+  // Líneas suspendidas / con incidencia (buscamos palabras clave en el estado)
+  const lineasIncidencia = filtered.filter((record) => {
+    const estado = (record.Estado || record.estado || '').toLowerCase();
+    return estado.includes('suspend') || estado.includes('inciden');
+  });
 
   return {
     total,
     disponibles: lineasDisponibles.length,
+    suspendidas: lineasIncidencia.length,
     registros: filtered,
-    lineasDisponibles: lineasDisponibles.map(record => ({
+    lineasDisponibles: lineasDisponibles.map((record) => ({
       id: record.id,
       Linea: record.Linea || record.linea || '',
       Estado: record.Estado || record.estado || ''

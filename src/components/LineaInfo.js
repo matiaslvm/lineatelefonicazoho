@@ -8,6 +8,9 @@ function LineaInfo({
   projectOptions,
   selectedProject,
   onProjectChange,
+  tipoSolicitudOptions,
+  selectedTipoSolicitud,
+  onTipoSolicitudChange,
   projectStats,
   loadingProjects,
   loadingStats,
@@ -40,7 +43,13 @@ function LineaInfo({
           </div>
           <div className="stat-card">
             <p className="stat-label">Líneas ocupadas</p>
-            <p className="stat-value">{projectStats.total - projectStats.disponibles}</p>
+            <p className="stat-value">
+              {projectStats.total - projectStats.disponibles - (projectStats.suspendidas || 0)}
+            </p>
+          </div>
+          <div className="stat-card">
+            <p className="stat-label">Líneas con incidencia</p>
+            <p className="stat-value">{projectStats.suspendidas || 0}</p>
           </div>
         </div>
 
@@ -95,6 +104,27 @@ function LineaInfo({
           <p className="helper-text">Cargando proyectos...</p>
         )}
       </div>
+
+      {selectedProject && (
+        <div className="selector-row" style={{ marginTop: '16px' }}>
+          <label htmlFor="tipoSolicitud" className="selector-label">
+            Tipo de solicitud
+          </label>
+          <select
+            id="tipoSolicitud"
+            className="selector-control"
+            value={selectedTipoSolicitud || ''}
+            onChange={(e) => onTipoSolicitudChange(e.target.value)}
+          >
+            <option value="">Seleccioná un tipo de solicitud</option>
+            {tipoSolicitudOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {error && (
         <div className="error-message">
