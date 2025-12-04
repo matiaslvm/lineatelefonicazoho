@@ -229,9 +229,25 @@
 
 .form-actions-left {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   font-size: 13px;
   color: #555;
+}
+
+.form-actions-left .checkbox-inline {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.notify-warning-text {
+  font-size: 11px;
+  color: #e65100;
+  margin-left: 24px;
+  line-height: 1.3;
+  opacity: 0.85;
 }
 
 .form-actions-right {

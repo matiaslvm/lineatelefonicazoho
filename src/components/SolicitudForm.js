@@ -451,6 +451,11 @@ function SolicitudForm({
               />
               <span>Notificar el pedido</span>
             </label>
+            {!formData.Notificar_el_pedido && (
+              <span className="notify-warning-text">
+                ⚠️ No se notificará a nadie y quedará en stand-by
+              </span>
+            )}
           </div>
 
           <div className="form-actions-right">
