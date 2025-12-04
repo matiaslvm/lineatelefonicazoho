@@ -277,7 +277,8 @@ function App() {
           Area: formData.Area || '',
           Plan: formData.Plan || '',
           Name: formData.Name,
-          Empresa_Proveedor: formData.Empresa_Proveedor || ''
+          Empresa_Proveedor: formData.Empresa_Proveedor || '',
+          Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -295,7 +296,8 @@ function App() {
           Plan: formData.Plan || '',
           Name: formData.Name,
           Empresa_Proveedor: formData.Empresa_Proveedor || '',
-          Linea: formData.Linea || ''
+          Linea: formData.Linea || '',
+          Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
         const created = await insertRecord(MODULE_NAME, solicitudData);
@@ -317,7 +319,8 @@ function App() {
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
           Name: formData.Name,
-          Motivo_de_reasignaci_n: formData.Motivo_de_reasignaci_n || ''
+          Motivo_de_reasignaci_n: formData.Motivo_de_reasignaci_n || '',
+          Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -335,7 +338,8 @@ function App() {
           Prioridad: formData.Prioridad || '',
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
-          Name: formData.Name
+          Name: formData.Name,
+          Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -353,7 +357,8 @@ function App() {
           Prioridad: formData.Prioridad || '',
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
-          Name: formData.Name
+          Name: formData.Name,
+          Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);

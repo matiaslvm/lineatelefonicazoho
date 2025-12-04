@@ -28,27 +28,19 @@ function SolicitudForm({
     Name: '',
     Linea: '',
     Empresa_Proveedor: '',
-    Motivo_de_reasignaci_n: ''
+    Motivo_de_reasignaci_n: '',
+    Notificar_el_pedido: true
   };
 
   const [formData, setFormData] = useState(initialFormState);
 
   // Cada vez que cambia el proyecto o la disponibilidad, reseteamos el formulario
   useEffect(() => {
-    setFormData({
-      Prioridad: '',
-      Comentarios: '',
-      Area: '',
-      Plan: '',
-      Name: '',
-      Linea: '',
-      Empresa_Proveedor: '',
-      Motivo_de_reasignaci_n: ''
-    });
+    setFormData(initialFormState);
   }, [selectedProject, availabilityStatus, selectedTipoSolicitud]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
     // Si cambiamos la línea seleccionada y estamos en "Asignar línea disponible",
     // intentamos autocompletar el Plan desde los registros del proyecto.
@@ -69,7 +61,7 @@ function SolicitudForm({
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -367,11 +359,10 @@ function SolicitudForm({
 
           {(selectedTipoSolicitud === 'Solicitar nueva línea' ||
             selectedTipoSolicitud === 'Asignar línea disponible') && (
-            <div className="form-group">
-              <label htmlFor="Plan" className="form-label">
-                <span className="label-icon">📋</span>
-                Plan
-              </label>
+          <div className="form-group">
+            <label htmlFor="Plan" className="form-label">
+              Plan
+            </label>
               <select
                 id="Plan"
                 name="Plan"
@@ -448,23 +439,39 @@ function SolicitudForm({
         )}
 
         <div className="form-actions">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="btn btn-secondary"
-            disabled={loading}
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            className={`btn btn-primary ${solicitudType}`}
-            disabled={loading || !isFormValid}
-          >
-            {loading
-              ? 'Procesando...'
-              : 'Confirmar solicitud'}
-          </button>
+          <div className="form-actions-left">
+            <label className="form-label checkbox-inline" htmlFor="Notificar_el_pedido">
+              <input
+                id="Notificar_el_pedido"
+                name="Notificar_el_pedido"
+                type="checkbox"
+                checked={!!formData.Notificar_el_pedido}
+                onChange={handleChange}
+                className="form-checkbox"
+              />
+              <span>Notificar el pedido</span>
+            </label>
+          </div>
+
+          <div className="form-actions-right">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="btn btn-secondary"
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className={`btn btn-primary ${solicitudType}`}
+              disabled={loading || !isFormValid}
+            >
+              {loading
+                ? 'Procesando...'
+                : 'Confirmar solicitud'}
+            </button>
+          </div>
         </div>
       </form>
     </div>
