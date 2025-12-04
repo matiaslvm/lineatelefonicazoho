@@ -60,6 +60,41 @@
   box-shadow: 0 0 0 3px rgba(93, 95, 239, 0.15);
 }
 
+/* Estilos para destacar selectores cuando no están seleccionados */
+.selector-row-highlight {
+  animation: highlightPulse 3s ease-in-out infinite;
+}
+
+.selector-control-highlight {
+  border: 1.5px solid #34d399 !important;
+  background: #f9fafb !important;
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.1), 0 2px 4px rgba(52, 211, 153, 0.08) !important;
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+.selector-row-highlight .selector-label {
+  color: #059669;
+  font-weight: 500;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.002);
+  }
+}
+
+@keyframes borderPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.1), 0 2px 4px rgba(52, 211, 153, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.15), 0 2px 6px rgba(52, 211, 153, 0.12);
+  }
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr;

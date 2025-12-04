@@ -79,13 +79,13 @@ function LineaInfo({
         </p>
       </div>
 
-      <div className="selector-row">
+      <div className={`selector-row ${!selectedProject ? 'selector-row-highlight' : ''}`}>
         <label htmlFor="proyectoOrigen" className="selector-label">
           Proyecto origen
         </label>
         <select
           id="proyectoOrigen"
-          className="selector-control"
+          className={`selector-control ${!selectedProject ? 'selector-control-highlight' : ''}`}
           value={selectedProject || ''}
           onChange={handleSelect}
           disabled={loadingProjects}
@@ -106,13 +106,13 @@ function LineaInfo({
       </div>
 
       {selectedProject && (
-        <div className="selector-row" style={{ marginTop: '16px' }}>
+        <div className={`selector-row ${!selectedTipoSolicitud ? 'selector-row-highlight' : ''}`} style={{ marginTop: '16px' }}>
           <label htmlFor="tipoSolicitud" className="selector-label">
             Tipo de solicitud
           </label>
           <select
             id="tipoSolicitud"
-            className="selector-control"
+            className={`selector-control ${!selectedTipoSolicitud ? 'selector-control-highlight' : ''}`}
             value={selectedTipoSolicitud || ''}
             onChange={(e) => onTipoSolicitudChange(e.target.value)}
           >

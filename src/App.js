@@ -38,6 +38,7 @@ function App() {
   const [prioridadOptions, setPrioridadOptions] = useState([]);
   const [areaOptions, setAreaOptions] = useState([]);
   const [planOptions, setPlanOptions] = useState([]);
+  const [proveedorOptions, setProveedorOptions] = useState([]);
 
   /**
    * Ajusta el tamaño del widget usando la SDK oficial de Zoho
@@ -89,24 +90,27 @@ function App() {
   const fetchPicklistOptions = async () => {
     try {
       console.log('Iniciando carga de picklists...');
-      const [tipoSolicitud, prioridad, area, plan] = await Promise.all([
+      const [tipoSolicitud, prioridad, area, plan, proveedor] = await Promise.all([
         getPicklistValues(MODULE_NAME, 'Tipo_de_solicitud'),
         getPicklistValues(MODULE_NAME, 'Prioridad'),
         getPicklistValues(MODULE_NAME, 'Area'),
-        getPicklistValues(MODULE_NAME, 'Plan')
+        getPicklistValues(MODULE_NAME, 'Plan'),
+        getPicklistValues(MODULE_NAME, 'Empresa_Proveedor')
       ]);
       
       console.log('Picklists cargados:', {
         tipoSolicitud: tipoSolicitud.length,
         prioridad: prioridad.length,
         area: area.length,
-        plan: plan.length
+        plan: plan.length,
+        proveedor: proveedor.length
       });
       
       setTipoSolicitudOptions(tipoSolicitud);
       setPrioridadOptions(prioridad);
       setAreaOptions(area);
       setPlanOptions(plan);
+      setProveedorOptions(proveedor);
     } catch (err) {
       console.error('Error al cargar opciones de picklists:', err);
       // No bloqueamos el flujo si falla, solo mostramos en consola
@@ -465,6 +469,7 @@ function App() {
                   prioridadOptions={prioridadOptions}
                   areaOptions={areaOptions}
                   planOptions={planOptions}
+                  proveedorOptions={proveedorOptions}
                   onSubmit={handleCreateSolicitud}
                   onCancel={handleCancelForm}
                   loading={submitting}

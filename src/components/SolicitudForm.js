@@ -15,6 +15,7 @@ function SolicitudForm({
   prioridadOptions = [],
   areaOptions = [],
   planOptions = [],
+  proveedorOptions = [],
   onSubmit,
   onCancel,
   loading
@@ -176,27 +177,16 @@ function SolicitudForm({
     return (
       <div className="solicitud-form-container">
         <div className="empty-form-state">
-          <div className="empty-form-icon">📋</div>
+          <div className="empty-form-icon">👈</div>
           <h3 className="empty-form-title">Seleccioná el tipo de solicitud</h3>
           <p className="empty-form-description">
             {selectedProject 
-              ? `Elegí el tipo de solicitud que querés realizar para el proyecto "${selectedProject}" y comenzá a completar el formulario.`
-              : 'Primero seleccioná un proyecto origen y luego el tipo de solicitud para continuar.'}
+              ? <>Usá el selector <strong>"Tipo de solicitud"</strong> en el panel izquierdo para elegir qué tipo de solicitud querés realizar para el proyecto "{selectedProject}".</>
+              : 'Primero seleccioná un proyecto origen en el panel izquierdo y luego elegí el tipo de solicitud.'}
           </p>
-          <div className="empty-form-steps">
-            <div className="step-item">
-              <span className="step-number">1</span>
-              <span className="step-text">Seleccioná el proyecto origen</span>
-              {selectedProject && <span className="step-check">✓</span>}
-            </div>
-            <div className="step-item">
-              <span className="step-number">2</span>
-              <span className="step-text">Elegí el tipo de solicitud</span>
-            </div>
-            <div className="step-item">
-              <span className="step-number">3</span>
-              <span className="step-text">Completá el formulario</span>
-            </div>
+          <div className="empty-form-hint">
+            <div className="hint-arrow">←</div>
+            <div className="hint-text">Usá el selector en el panel izquierdo</div>
           </div>
         </div>
       </div>
@@ -400,6 +390,29 @@ function SolicitudForm({
           )}
         </div>
 
+        {selectedTipoSolicitud === 'Solicitar nueva línea' && (
+          <div className="form-group">
+            <label htmlFor="Empresa_Proveedor" className="form-label">
+              Proveedor de la línea <span className="required">*</span>
+            </label>
+            <select
+              id="Empresa_Proveedor"
+              name="Empresa_Proveedor"
+              value={formData.Empresa_Proveedor}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
+              <option value="">Seleccioná un proveedor</option>
+              {proveedorOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className="form-group">
           <label htmlFor="Comentarios" className="form-label">
             Comentarios adicionales <span className="required">*</span>
@@ -415,24 +428,6 @@ function SolicitudForm({
             required
           />
         </div>
-
-        {selectedTipoSolicitud === 'Solicitar nueva línea' && (
-          <div className="form-group">
-            <label htmlFor="Empresa_Proveedor" className="form-label">
-              Proveedor de la línea <span className="required">*</span>
-            </label>
-            <input
-              id="Empresa_Proveedor"
-              name="Empresa_Proveedor"
-              type="text"
-              value={formData.Empresa_Proveedor}
-              onChange={handleChange}
-              className="form-select"
-              placeholder="Ingresá el proveedor de la nueva línea"
-              required
-            />
-          </div>
-        )}
 
         {selectedTipoSolicitud === 'Reasignar línea' && (
           <div className="form-group">
