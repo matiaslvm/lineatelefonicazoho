@@ -16,6 +16,7 @@ function SolicitudForm({
   areaOptions = [],
   planOptions = [],
   proveedorOptions = [],
+  tipoChipOptions = [],
   onSubmit,
   onCancel,
   loading,
@@ -30,6 +31,7 @@ function SolicitudForm({
     Name: '',
     Linea: '',
     Empresa_Proveedor: '',
+    Tipo_de_chip: '',
     Motivo_de_reasignaci_n: '',
     Propietario_nuevo: '',
     Notificar_el_pedido: true
@@ -74,10 +76,32 @@ function SolicitudForm({
           }
         }
 
+        // Buscar el valor correcto del Tipo_de_Chip en las opciones disponibles
+        let tipoChipValue = linea.Tipo_de_Chip || linea.Tipo_de_chip || '';
+        if (tipoChipValue && tipoChipOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = tipoChipOptions.find(
+            (opt) => opt.value === tipoChipValue || String(opt.value) === String(tipoChipValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = tipoChipOptions.find(
+              (opt) => opt.label === tipoChipValue || String(opt.label) === String(tipoChipValue)
+            );
+            if (labelMatch) {
+              tipoChipValue = labelMatch.value;
+            }
+          } else {
+            tipoChipValue = exactMatch.value;
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
           Linea: value,
           Plan: planValue,
+          Tipo_de_chip: tipoChipValue,
           Name: linea.Name || prev.Name // Autocompletar Name si existe, sino mantener el valor anterior
         }));
         return;
@@ -113,10 +137,32 @@ function SolicitudForm({
           }
         }
 
+        // Buscar el valor correcto del Tipo_de_Chip en las opciones disponibles
+        let tipoChipValue = linea.Tipo_de_Chip || linea.Tipo_de_chip || '';
+        if (tipoChipValue && tipoChipOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = tipoChipOptions.find(
+            (opt) => opt.value === tipoChipValue || String(opt.value) === String(tipoChipValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = tipoChipOptions.find(
+              (opt) => opt.label === tipoChipValue || String(opt.label) === String(tipoChipValue)
+            );
+            if (labelMatch) {
+              tipoChipValue = labelMatch.value;
+            }
+          } else {
+            tipoChipValue = exactMatch.value;
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
           Linea: value,
           Plan: planValue,
+          Tipo_de_chip: tipoChipValue,
           Name: linea.Name || ''
         }));
         return;
@@ -152,10 +198,32 @@ function SolicitudForm({
           }
         }
 
+        // Buscar el valor correcto del Tipo_de_Chip en las opciones disponibles
+        let tipoChipValue = linea.Tipo_de_Chip || linea.Tipo_de_chip || '';
+        if (tipoChipValue && tipoChipOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = tipoChipOptions.find(
+            (opt) => opt.value === tipoChipValue || String(opt.value) === String(tipoChipValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = tipoChipOptions.find(
+              (opt) => opt.label === tipoChipValue || String(opt.label) === String(tipoChipValue)
+            );
+            if (labelMatch) {
+              tipoChipValue = labelMatch.value;
+            }
+          } else {
+            tipoChipValue = exactMatch.value;
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
           Linea: value,
           Plan: planValue,
+          Tipo_de_chip: tipoChipValue,
           Name: linea.Name || ''
         }));
         return;
@@ -191,10 +259,32 @@ function SolicitudForm({
           }
         }
 
+        // Buscar el valor correcto del Tipo_de_Chip en las opciones disponibles
+        let tipoChipValue = linea.Tipo_de_Chip || linea.Tipo_de_chip || '';
+        if (tipoChipValue && tipoChipOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = tipoChipOptions.find(
+            (opt) => opt.value === tipoChipValue || String(opt.value) === String(tipoChipValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = tipoChipOptions.find(
+              (opt) => opt.label === tipoChipValue || String(opt.label) === String(tipoChipValue)
+            );
+            if (labelMatch) {
+              tipoChipValue = labelMatch.value;
+            }
+          } else {
+            tipoChipValue = exactMatch.value;
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
           Linea: value,
           Plan: planValue,
+          Tipo_de_chip: tipoChipValue,
           Name: linea.Name || ''
         }));
         return;
@@ -230,10 +320,32 @@ function SolicitudForm({
           }
         }
 
+        // Buscar el valor correcto del Tipo_de_Chip en las opciones disponibles
+        let tipoChipValue = linea.Tipo_de_Chip || linea.Tipo_de_chip || '';
+        if (tipoChipValue && tipoChipOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = tipoChipOptions.find(
+            (opt) => opt.value === tipoChipValue || String(opt.value) === String(tipoChipValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = tipoChipOptions.find(
+              (opt) => opt.label === tipoChipValue || String(opt.label) === String(tipoChipValue)
+            );
+            if (labelMatch) {
+              tipoChipValue = labelMatch.value;
+            }
+          } else {
+            tipoChipValue = exactMatch.value;
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
           Linea: value,
           Plan: planValue,
+          Tipo_de_chip: tipoChipValue,
           Name: linea.Name || ''
         }));
         return;
@@ -590,45 +702,129 @@ function SolicitudForm({
           )}
         </div>
 
+        {/* Fila con Propietario nuevo y Tipo de chip (solo para Reasignar línea) */}
         {selectedTipoSolicitud === 'Reasignar línea' && (
-          <div className="form-group">
-            <label htmlFor="Propietario_nuevo" className="form-label">
-              Propietario nuevo <span className="required">*</span>
-            </label>
-            <input
-              id="Propietario_nuevo"
-              name="Propietario_nuevo"
-              type="text"
-              value={formData.Propietario_nuevo}
-              onChange={handleChange}
-              className="form-select"
-              placeholder="Ingresá el nombre del nuevo propietario de la línea"
-              required
-            />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="Propietario_nuevo" className="form-label">
+                Propietario nuevo <span className="required">*</span>
+              </label>
+              <input
+                id="Propietario_nuevo"
+                name="Propietario_nuevo"
+                type="text"
+                value={formData.Propietario_nuevo}
+                onChange={handleChange}
+                className="form-select"
+                placeholder="Ingresá el nombre del nuevo propietario de la línea"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Tipo_de_chip" className="form-label">
+                Tipo de chip
+              </label>
+              <select
+                id="Tipo_de_chip"
+                name="Tipo_de_chip"
+                value={formData.Tipo_de_chip}
+                onChange={handleChange}
+                className="form-select form-select-readonly"
+                disabled
+              >
+                <option value="">Seleccioná un tipo de chip</option>
+                {tipoChipOptions && tipoChipOptions.length > 0 ? (
+                  tipoChipOptions.map((option) => (
+                    <option key={option.value || option.label} value={option.value || option.label}>
+                      {option.label || option.value}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>Cargando opciones...</option>
+                )}
+              </select>
+            </div>
           </div>
         )}
 
+        {/* Proveedor de línea y Tipo de chip (solo para Solicitar nueva línea) */}
         {selectedTipoSolicitud === 'Solicitar nueva línea' && (
-          <div className="form-group">
-            <label htmlFor="Empresa_Proveedor" className="form-label">
-              Proveedor de la línea <span className="required">*</span>
-            </label>
-            <select
-              id="Empresa_Proveedor"
-              name="Empresa_Proveedor"
-              value={formData.Empresa_Proveedor}
-              onChange={handleChange}
-              className="form-select"
-              required
-            >
-              <option value="">Seleccioná un proveedor</option>
-              {proveedorOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="Empresa_Proveedor" className="form-label">
+                Proveedor de línea <span className="required">*</span>
+              </label>
+              <select
+                id="Empresa_Proveedor"
+                name="Empresa_Proveedor"
+                value={formData.Empresa_Proveedor}
+                onChange={handleChange}
+                className="form-select"
+                required
+              >
+                <option value="">Seleccioná un proveedor</option>
+                {proveedorOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="Tipo_de_chip" className="form-label">
+                Tipo de chip
+              </label>
+              <select
+                id="Tipo_de_chip"
+                name="Tipo_de_chip"
+                value={formData.Tipo_de_chip}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Seleccioná un tipo de chip</option>
+                {tipoChipOptions && tipoChipOptions.length > 0 ? (
+                  tipoChipOptions.map((option) => (
+                    <option key={option.value || option.label} value={option.value || option.label}>
+                      {option.label || option.value}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>Cargando opciones...</option>
+                )}
+              </select>
+            </div>
           </div>
+        )}
+
+        {/* Tipo de chip solo (para otros casos que no sean Solicitar nueva línea ni Reasignar línea) */}
+        {(selectedTipoSolicitud === 'Asignar línea disponible' ||
+          selectedTipoSolicitud === 'Reportar incidencia' ||
+          selectedTipoSolicitud === 'Mantenimiento' ||
+          selectedTipoSolicitud === 'Solicitar baja') && (
+            <div className="form-group">
+              <label htmlFor="Tipo_de_chip" className="form-label">
+                Tipo de chip
+              </label>
+              <select
+                id="Tipo_de_chip"
+                name="Tipo_de_chip"
+                value={formData.Tipo_de_chip}
+                onChange={handleChange}
+                className="form-select form-select-readonly"
+                disabled
+              >
+                <option value="">Seleccioná un tipo de chip</option>
+                {tipoChipOptions && tipoChipOptions.length > 0 ? (
+                  tipoChipOptions.map((option) => (
+                    <option key={option.value || option.label} value={option.value || option.label}>
+                      {option.label || option.value}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>Cargando opciones...</option>
+                )}
+              </select>
+            </div>
         )}
 
         {selectedTipoSolicitud === 'Reasignar línea' && (

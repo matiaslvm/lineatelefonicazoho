@@ -53,8 +53,19 @@ export async function getPicklistValues(module, fieldApiName) {
             (f) =>
               f.api_name === fieldApiName ||
               f.api_name === fieldApiName.toLowerCase() ||
-              f.api_name === fieldApiName.toUpperCase()
+              f.api_name === fieldApiName.toUpperCase() ||
+              f.api_name === fieldApiName.replace(/_/g, '') ||
+              f.api_name === fieldApiName.replace(/_/g, '_')
           );
+          
+          // Log para debug si no se encuentra el campo
+          if (!field && (fieldApiName === 'Tipo_de_Chip' || fieldApiName === 'Tipo_de_chip')) {
+            console.log('Buscando campo Tipo_de_Chip. Campos disponibles:', 
+              fieldsResponse.fields
+                .filter(f => f.api_name && f.api_name.toLowerCase().includes('chip'))
+                .map(f => f.api_name)
+            );
+          }
           if (field && field.pick_list_values && field.pick_list_values.length > 0) {
             const values = field.pick_list_values.filter(
               (item) =>

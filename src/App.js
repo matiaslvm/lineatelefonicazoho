@@ -39,6 +39,7 @@ function App() {
   const [areaOptions, setAreaOptions] = useState([]);
   const [planOptions, setPlanOptions] = useState([]);
   const [proveedorOptions, setProveedorOptions] = useState([]);
+  const [tipoChipOptions, setTipoChipOptions] = useState([]);
 
   /**
    * Ajusta el tamaño del widget usando la SDK oficial de Zoho
@@ -90,12 +91,13 @@ function App() {
   const fetchPicklistOptions = async () => {
     try {
       console.log('Iniciando carga de picklists...');
-      const [tipoSolicitud, prioridad, area, plan, proveedor] = await Promise.all([
+      const [tipoSolicitud, prioridad, area, plan, proveedor, tipoChip] = await Promise.all([
         getPicklistValues(MODULE_NAME, 'Tipo_de_solicitud'),
         getPicklistValues(MODULE_NAME, 'Prioridad'),
         getPicklistValues(MODULE_NAME, 'Area'),
         getPicklistValues(MODULE_NAME, 'Plan'),
-        getPicklistValues(MODULE_NAME, 'Empresa_Proveedor')
+        getPicklistValues(MODULE_NAME, 'Empresa_Proveedor'),
+        getPicklistValues(MODULE_NAME, 'Tipo_de_Chip')
       ]);
       
       console.log('Picklists cargados:', {
@@ -103,16 +105,34 @@ function App() {
         prioridad: prioridad.length,
         area: area.length,
         plan: plan.length,
-        proveedor: proveedor.length
+        proveedor: proveedor.length,
+        tipoChip: tipoChip.length
       });
+      
+      // Log específico para Tipo_de_chip para debug
+      if (tipoChip.length === 0) {
+        console.warn('⚠️ No se encontraron opciones para Tipo_de_Chip. Verificá que el campo exista en el módulo.');
+      } else {
+        console.log('✅ Opciones de Tipo_de_Chip cargadas:', tipoChip);
+      }
       
       setTipoSolicitudOptions(tipoSolicitud);
       setPrioridadOptions(prioridad);
       setAreaOptions(area);
       setPlanOptions(plan);
       setProveedorOptions(proveedor);
+      setTipoChipOptions(tipoChip);
     } catch (err) {
       console.error('Error al cargar opciones de picklists:', err);
+      // Si falla la carga de Tipo_de_chip específicamente, intentar cargarlo por separado
+      try {
+        console.log('Intentando cargar Tipo_de_Chip por separado...');
+        const tipoChipFallback = await getPicklistValues(MODULE_NAME, 'Tipo_de_Chip');
+        console.log('Tipo_de_Chip cargado por separado:', tipoChipFallback);
+        setTipoChipOptions(tipoChipFallback);
+      } catch (chipErr) {
+        console.error('Error al cargar Tipo_de_Chip:', chipErr);
+      }
       // No bloqueamos el flujo si falla, solo mostramos en consola
     }
   };
@@ -278,6 +298,7 @@ function App() {
           Plan: formData.Plan || '',
           Name: formData.Name,
           Empresa_Proveedor: formData.Empresa_Proveedor || '',
+          Tipo_de_Chip: formData.Tipo_de_chip || '',
           Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
@@ -296,6 +317,7 @@ function App() {
           Plan: formData.Plan || '',
           Name: formData.Name,
           Empresa_Proveedor: formData.Empresa_Proveedor || '',
+          Tipo_de_Chip: formData.Tipo_de_chip || '',
           Linea: formData.Linea || '',
           Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
@@ -320,6 +342,7 @@ function App() {
           Area: formData.Area || '',
           Name: formData.Propietario_nuevo || formData.Name, // Usar el nuevo propietario si está definido
           Plan: formData.Plan || '',
+          Tipo_de_Chip: formData.Tipo_de_chip || '',
           Propietario_nuevo: formData.Propietario_nuevo || '',
           Motivo_de_reasignaci_n: formData.Motivo_de_reasignaci_n || '',
           Notificar_el_pedido: !!formData.Notificar_el_pedido
@@ -341,6 +364,8 @@ function App() {
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
           Name: formData.Name,
+          Plan: formData.Plan || '',
+          Tipo_de_Chip: formData.Tipo_de_chip || '',
           Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
@@ -360,6 +385,8 @@ function App() {
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
           Name: formData.Name,
+          Plan: formData.Plan || '',
+          Tipo_de_Chip: formData.Tipo_de_chip || '',
           Notificar_el_pedido: !!formData.Notificar_el_pedido
         };
 
@@ -383,7 +410,9 @@ function App() {
           Prioridad: formData.Prioridad || '',
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
-          Name: formData.Name
+          Name: formData.Name,
+          Plan: formData.Plan || '',
+          Tipo_de_chip: formData.Tipo_de_chip || ''
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -490,6 +519,7 @@ function App() {
                   areaOptions={areaOptions}
                   planOptions={planOptions}
                   proveedorOptions={proveedorOptions}
+                  tipoChipOptions={tipoChipOptions}
                   onSubmit={handleCreateSolicitud}
                   onCancel={handleCancelForm}
                   loading={submitting}
