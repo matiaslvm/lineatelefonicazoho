@@ -29,6 +29,7 @@ function SolicitudForm({
     Linea: '',
     Empresa_Proveedor: '',
     Motivo_de_reasignaci_n: '',
+    Propietario_nuevo: '',
     Notificar_el_pedido: true
   };
 
@@ -43,17 +44,195 @@ function SolicitudForm({
     const { name, value, type, checked } = e.target;
 
     // Si cambiamos la línea seleccionada y estamos en "Asignar línea disponible",
-    // intentamos autocompletar el Plan desde los registros del proyecto.
+    // autocompletamos Plan y Name desde los registros del proyecto.
     if (name === 'Linea' && selectedTipoSolicitud === 'Asignar línea disponible' && projectStats?.registros) {
       const linea = projectStats.registros.find(
         (r) => r.id === value || String(r.id) === String(value)
       );
 
-      if (linea && linea.Plan) {
+      if (linea) {
+        // Buscar el valor correcto del Plan en las opciones disponibles
+        let planValue = linea.Plan || '';
+        if (planValue && planOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = planOptions.find(
+            (opt) => opt.value === planValue || String(opt.value) === String(planValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = planOptions.find(
+              (opt) => opt.label === planValue || String(opt.label) === String(planValue)
+            );
+            if (labelMatch) {
+              planValue = labelMatch.value;
+            }
+          } else {
+            planValue = exactMatch.value;
+          }
+        }
+
         setFormData((prev) => ({
           ...prev,
           Linea: value,
-          Plan: linea.Plan
+          Plan: planValue,
+          Name: linea.Name || prev.Name // Autocompletar Name si existe, sino mantener el valor anterior
+        }));
+        return;
+      }
+    }
+
+    // Si cambiamos la línea seleccionada y estamos en "Reasignar línea",
+    // autocompletamos Plan y Name (propietario actual) desde los registros del proyecto.
+    if (name === 'Linea' && selectedTipoSolicitud === 'Reasignar línea' && projectStats?.registros) {
+      const linea = projectStats.registros.find(
+        (r) => r.id === value || String(r.id) === String(value)
+      );
+
+      if (linea) {
+        // Buscar el valor correcto del Plan en las opciones disponibles
+        let planValue = linea.Plan || '';
+        if (planValue && planOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = planOptions.find(
+            (opt) => opt.value === planValue || String(opt.value) === String(planValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = planOptions.find(
+              (opt) => opt.label === planValue || String(opt.label) === String(planValue)
+            );
+            if (labelMatch) {
+              planValue = labelMatch.value;
+            }
+          } else {
+            planValue = exactMatch.value;
+          }
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          Linea: value,
+          Plan: planValue,
+          Name: linea.Name || ''
+        }));
+        return;
+      }
+    }
+
+    // Si cambiamos la línea seleccionada y estamos en "Reportar incidencia",
+    // autocompletamos Plan y Name (propietario actual) desde los registros del proyecto.
+    if (name === 'Linea' && selectedTipoSolicitud === 'Reportar incidencia' && projectStats?.registros) {
+      const linea = projectStats.registros.find(
+        (r) => r.id === value || String(r.id) === String(value)
+      );
+
+      if (linea) {
+        // Buscar el valor correcto del Plan en las opciones disponibles
+        let planValue = linea.Plan || '';
+        if (planValue && planOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = planOptions.find(
+            (opt) => opt.value === planValue || String(opt.value) === String(planValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = planOptions.find(
+              (opt) => opt.label === planValue || String(opt.label) === String(planValue)
+            );
+            if (labelMatch) {
+              planValue = labelMatch.value;
+            }
+          } else {
+            planValue = exactMatch.value;
+          }
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          Linea: value,
+          Plan: planValue,
+          Name: linea.Name || ''
+        }));
+        return;
+      }
+    }
+
+    // Si cambiamos la línea seleccionada y estamos en "Mantenimiento",
+    // autocompletamos Plan y Name (propietario actual) desde los registros del proyecto.
+    if (name === 'Linea' && selectedTipoSolicitud === 'Mantenimiento' && projectStats?.registros) {
+      const linea = projectStats.registros.find(
+        (r) => r.id === value || String(r.id) === String(value)
+      );
+
+      if (linea) {
+        // Buscar el valor correcto del Plan en las opciones disponibles
+        let planValue = linea.Plan || '';
+        if (planValue && planOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = planOptions.find(
+            (opt) => opt.value === planValue || String(opt.value) === String(planValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = planOptions.find(
+              (opt) => opt.label === planValue || String(opt.label) === String(planValue)
+            );
+            if (labelMatch) {
+              planValue = labelMatch.value;
+            }
+          } else {
+            planValue = exactMatch.value;
+          }
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          Linea: value,
+          Plan: planValue,
+          Name: linea.Name || ''
+        }));
+        return;
+      }
+    }
+
+    // Si cambiamos la línea seleccionada y estamos en "Solicitar baja",
+    // autocompletamos Plan y Name (propietario actual) desde los registros del proyecto.
+    if (name === 'Linea' && selectedTipoSolicitud === 'Solicitar baja' && projectStats?.registros) {
+      const linea = projectStats.registros.find(
+        (r) => r.id === value || String(r.id) === String(value)
+      );
+
+      if (linea) {
+        // Buscar el valor correcto del Plan en las opciones disponibles
+        let planValue = linea.Plan || '';
+        if (planValue && planOptions.length > 0) {
+          // Primero intentar coincidencia exacta con el value
+          const exactMatch = planOptions.find(
+            (opt) => opt.value === planValue || String(opt.value) === String(planValue)
+          );
+          
+          // Si no hay coincidencia exacta, buscar por label
+          if (!exactMatch) {
+            const labelMatch = planOptions.find(
+              (opt) => opt.label === planValue || String(opt.label) === String(planValue)
+            );
+            if (labelMatch) {
+              planValue = labelMatch.value;
+            }
+          } else {
+            planValue = exactMatch.value;
+          }
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          Linea: value,
+          Plan: planValue,
+          Name: linea.Name || ''
         }));
         return;
       }
@@ -152,17 +331,20 @@ function SolicitudForm({
 
   const requiereMotivoReasignacion = tipoNorm.includes('reasignar');
 
-  const isFormBaseValid = selectedTipoSolicitud && formData.Comentarios && formData.Name;
+  const isFormBaseValid = selectedTipoSolicitud && formData.Name;
 
   // La línea solo es requerida si se requiere línea Y hay líneas disponibles
   const requiereLineaYDisponible = requiereLinea && lineasDisponibles.length > 0;
+  
+  const requierePropietarioNuevo = tipoNorm.includes('reasignar');
   
   const isFormValid =
     isFormBaseValid &&
     (!requiereLineaYDisponible || formData.Linea) &&
     (!requierePlan || formData.Plan) &&
     (!requiereProveedor || formData.Empresa_Proveedor) &&
-    (!requiereMotivoReasignacion || formData.Motivo_de_reasignaci_n);
+    (!requiereMotivoReasignacion || formData.Motivo_de_reasignaci_n) &&
+    (!requierePropietarioNuevo || formData.Propietario_nuevo);
 
   // Si no hay tipo de solicitud seleccionado, mostrar estado inicial
   if (!selectedTipoSolicitud) {
@@ -343,7 +525,10 @@ function SolicitudForm({
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="Name" className="form-label">
-              Propietario de línea <span className="required">*</span>
+              {(selectedTipoSolicitud === 'Reasignar línea' || 
+                selectedTipoSolicitud === 'Reportar incidencia' ||
+                selectedTipoSolicitud === 'Mantenimiento' ||
+                selectedTipoSolicitud === 'Solicitar baja') ? 'Propietario actual' : 'Propietario de línea'} <span className="required">*</span>
             </label>
             <input
               id="Name"
@@ -351,14 +536,25 @@ function SolicitudForm({
               type="text"
               value={formData.Name}
               onChange={handleChange}
-              className="form-select"
+              className={`form-select ${(selectedTipoSolicitud === 'Reasignar línea' || 
+                selectedTipoSolicitud === 'Reportar incidencia' ||
+                selectedTipoSolicitud === 'Mantenimiento' ||
+                selectedTipoSolicitud === 'Solicitar baja') ? 'form-select-readonly' : ''}`}
               placeholder="Ingresá el nombre del propietario de la línea"
               required
+              readOnly={selectedTipoSolicitud === 'Reasignar línea' || 
+                selectedTipoSolicitud === 'Reportar incidencia' ||
+                selectedTipoSolicitud === 'Mantenimiento' ||
+                selectedTipoSolicitud === 'Solicitar baja'}
             />
           </div>
 
           {(selectedTipoSolicitud === 'Solicitar nueva línea' ||
-            selectedTipoSolicitud === 'Asignar línea disponible') && (
+            selectedTipoSolicitud === 'Asignar línea disponible' ||
+            selectedTipoSolicitud === 'Reasignar línea' ||
+            selectedTipoSolicitud === 'Reportar incidencia' ||
+            selectedTipoSolicitud === 'Mantenimiento' ||
+            selectedTipoSolicitud === 'Solicitar baja') && (
           <div className="form-group">
             <label htmlFor="Plan" className="form-label">
               Plan
@@ -368,7 +564,16 @@ function SolicitudForm({
                 name="Plan"
                 value={formData.Plan}
                 onChange={handleChange}
-                className="form-select"
+                className={`form-select ${(selectedTipoSolicitud === 'Asignar línea disponible' ||
+                  selectedTipoSolicitud === 'Reasignar línea' || 
+                  selectedTipoSolicitud === 'Reportar incidencia' ||
+                  selectedTipoSolicitud === 'Mantenimiento' ||
+                  selectedTipoSolicitud === 'Solicitar baja') ? 'form-select-readonly' : ''}`}
+                disabled={selectedTipoSolicitud === 'Asignar línea disponible' ||
+                  selectedTipoSolicitud === 'Reasignar línea' || 
+                  selectedTipoSolicitud === 'Reportar incidencia' ||
+                  selectedTipoSolicitud === 'Mantenimiento' ||
+                  selectedTipoSolicitud === 'Solicitar baja'}
               >
                 <option value="">Seleccioná un plan</option>
                 {planOptions.map((option) => (
@@ -380,6 +585,24 @@ function SolicitudForm({
             </div>
           )}
         </div>
+
+        {selectedTipoSolicitud === 'Reasignar línea' && (
+          <div className="form-group">
+            <label htmlFor="Propietario_nuevo" className="form-label">
+              Propietario nuevo <span className="required">*</span>
+            </label>
+            <input
+              id="Propietario_nuevo"
+              name="Propietario_nuevo"
+              type="text"
+              value={formData.Propietario_nuevo}
+              onChange={handleChange}
+              className="form-select"
+              placeholder="Ingresá el nombre del nuevo propietario de la línea"
+              required
+            />
+          </div>
+        )}
 
         {selectedTipoSolicitud === 'Solicitar nueva línea' && (
           <div className="form-group">
@@ -404,22 +627,6 @@ function SolicitudForm({
           </div>
         )}
 
-        <div className="form-group">
-          <label htmlFor="Comentarios" className="form-label">
-            Comentarios adicionales <span className="required">*</span>
-          </label>
-          <textarea
-            id="Comentarios"
-            name="Comentarios"
-            value={formData.Comentarios}
-            onChange={handleChange}
-            className="form-textarea"
-            rows="4"
-            placeholder="Describe la necesidad de la solicitud, contexto y responsables..."
-            required
-          />
-        </div>
-
         {selectedTipoSolicitud === 'Reasignar línea' && (
           <div className="form-group">
             <label htmlFor="Motivo_de_reasignaci_n" className="form-label">
@@ -437,6 +644,21 @@ function SolicitudForm({
             />
           </div>
         )}
+
+        <div className="form-group">
+          <label htmlFor="Comentarios" className="form-label">
+            Comentarios adicionales
+          </label>
+          <textarea
+            id="Comentarios"
+            name="Comentarios"
+            value={formData.Comentarios}
+            onChange={handleChange}
+            className="form-textarea"
+            rows="4"
+            placeholder="Describe la necesidad de la solicitud, contexto y responsables..."
+          />
+        </div>
 
         <div className="form-actions">
           <div className="form-actions-left">

@@ -318,7 +318,9 @@ function App() {
           Prioridad: formData.Prioridad || '',
           Comentarios: formData.Comentarios,
           Area: formData.Area || '',
-          Name: formData.Name,
+          Name: formData.Propietario_nuevo || formData.Name, // Usar el nuevo propietario si está definido
+          Plan: formData.Plan || '',
+          Propietario_nuevo: formData.Propietario_nuevo || '',
           Motivo_de_reasignaci_n: formData.Motivo_de_reasignaci_n || '',
           Notificar_el_pedido: !!formData.Notificar_el_pedido
         };

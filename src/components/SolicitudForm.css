@@ -410,6 +410,20 @@
   box-shadow: none;
 }
 
+/* Estilos para campos readonly (autocompletados) */
+.form-select-readonly {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.form-select-readonly:focus {
+  border-color: #d7d9e4;
+  box-shadow: none;
+  outline: none;
+}
+
 /* Estado inicial del formulario cuando no hay tipo de solicitud seleccionado */
 .empty-form-state {
   text-align: center;
