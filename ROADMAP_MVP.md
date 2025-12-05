@@ -215,3 +215,4 @@ Post-MVP: Fase 3 (Funcionalidades adicionales)
 **Estado**: 🟡 En revisión
 
 
+

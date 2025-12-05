@@ -134,3 +134,4 @@ El MVP está listo cuando:
 **Estado**: 🟡 En revisión - Esperando validaciones
 
 
+

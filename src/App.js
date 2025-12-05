@@ -423,16 +423,29 @@ function App() {
   const handleOpenLastRecord = () => {
     if (!lastRecordId) return;
 
-    if (window.ZOHO && window.ZOHO.CRM && window.ZOHO.CRM.UI && window.ZOHO.CRM.UI.Record && window.ZOHO.CRM.UI.Record.open) {
-      window.ZOHO.CRM.UI.Record.open({
-        Entity: MODULE_NAME,
-        RecordID: lastRecordId
-      });
-    } else {
-      // Fallback básico: abrir en nueva pestaña usando la URL actual como base
-      const baseUrl = window.location.origin;
-      const url = `${baseUrl}/crm/org/${MODULE_NAME}/${lastRecordId}`;
+    // Siempre abrir en nueva pestaña
+    // Construir la URL del registro en Zoho CRM usando el formato: https://crm.zoho.com/crm/{orgId}/tab/CustomModule3/{RecordId}
+    const currentUrl = window.location.href;
+    
+    // Extraer el orgId de la URL actual (formato: /crm/org{id}/ o /crm/{orgId}/)
+    const urlMatch = currentUrl.match(/\/crm\/(org\d+|org[^/]+)\//);
+    if (urlMatch) {
+      const orgId = urlMatch[1];
+      // Construir la URL con el formato correcto de Zoho CRM usando CustomModule3
+      const url = `https://crm.zoho.com/crm/${orgId}/tab/CustomModule3/${lastRecordId}`;
       window.open(url, '_blank');
+    } else {
+      // Fallback: intentar extraer de otra forma o usar formato alternativo
+      const fallbackMatch = currentUrl.match(/\/crm\/([^/]+)\//);
+      if (fallbackMatch) {
+        const orgId = fallbackMatch[1];
+        const url = `https://crm.zoho.com/crm/${orgId}/tab/CustomModule3/${lastRecordId}`;
+        window.open(url, '_blank');
+      } else {
+        // Último fallback: usar formato genérico con org875647965 como ejemplo
+        const url = `https://crm.zoho.com/crm/org875647965/tab/CustomModule3/${lastRecordId}`;
+        window.open(url, '_blank');
+      }
     }
   };
 
@@ -480,18 +493,9 @@ function App() {
                   onSubmit={handleCreateSolicitud}
                   onCancel={handleCancelForm}
                   loading={submitting}
+                  lastRecordId={lastRecordId}
+                  onOpenLastRecord={handleOpenLastRecord}
                 />
-                {lastRecordId && (
-                  <div className="actions-section">
-                    <button
-                      type="button"
-                      onClick={handleOpenLastRecord}
-                      className="btn-action-secondary"
-                    >
-                      Ver registro actualizado
-                    </button>
-                  </div>
-                )}
               </>
             ) : (
               <div className="empty-state">

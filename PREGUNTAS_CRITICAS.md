@@ -133,3 +133,4 @@ Antes de marcar como resuelto, asegurarse de:
 **⚠️ IMPORTANTE**: No avanzar con desarrollo significativo hasta resolver al menos las preguntas marcadas como 🔴 CRÍTICAS.
 
 
+

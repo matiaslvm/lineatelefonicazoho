@@ -18,7 +18,9 @@ function SolicitudForm({
   proveedorOptions = [],
   onSubmit,
   onCancel,
-  loading
+  loading,
+  lastRecordId,
+  onOpenLastRecord
 }) {
   const initialFormState = {
     Prioridad: '',
@@ -331,7 +333,7 @@ function SolicitudForm({
 
   const requiereMotivoReasignacion = tipoNorm.includes('reasignar');
 
-  const isFormBaseValid = selectedTipoSolicitud && formData.Name;
+  const isFormBaseValid = selectedTipoSolicitud && formData.Name && formData.Prioridad && formData.Area;
 
   // La línea solo es requerida si se requiere línea Y hay líneas disponibles
   const requiereLineaYDisponible = requiereLinea && lineasDisponibles.length > 0;
@@ -483,7 +485,7 @@ function SolicitudForm({
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="Prioridad" className="form-label">
-              Prioridad
+              Prioridad <span className="required">*</span>
             </label>
             <select
               id="Prioridad"
@@ -491,6 +493,7 @@ function SolicitudForm({
               value={formData.Prioridad}
               onChange={handleChange}
               className="form-select"
+              required
             >
               <option value="">Seleccioná una opción</option>
               {prioridadOptions.map((option) => (
@@ -503,7 +506,7 @@ function SolicitudForm({
 
           <div className="form-group">
             <label htmlFor="Area" className="form-label">
-              Área solicitante
+              Área solicitante <span className="required">*</span>
             </label>
             <select
               id="Area"
@@ -511,6 +514,7 @@ function SolicitudForm({
               value={formData.Area}
               onChange={handleChange}
               className="form-select"
+              required
             >
               <option value="">Seleccioná una opción</option>
               {areaOptions.map((option) => (
@@ -681,6 +685,16 @@ function SolicitudForm({
           </div>
 
           <div className="form-actions-right">
+            {lastRecordId && onOpenLastRecord && (
+              <button
+                type="button"
+                onClick={onOpenLastRecord}
+                className="btn btn-secondary"
+                disabled={loading}
+              >
+                Ver registro actualizado
+              </button>
+            )}
             <button
               type="button"
               onClick={onCancel}
