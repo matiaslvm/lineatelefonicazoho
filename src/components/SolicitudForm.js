@@ -380,6 +380,11 @@ function SolicitudForm({
 
   const isLineaExistente = !tipoNorm.includes('nueva linea') && lineasDisponibles.length > 0;
   const solicitudType = tipoNorm.includes('nueva linea') ? 'nueva' : 'existente';
+  
+  // Bloquear formulario si es "Asignar línea disponible" y no hay líneas disponibles
+  const isFormDisabled = tipoNorm.includes('asignar') && 
+                         tipoNorm.includes('disponible') && 
+                         lineasDisponibles.length === 0;
 
   // Mensaje contextual según el tipo de solicitud y disponibilidad
   const getAvailabilityMessage = () => {
@@ -606,6 +611,7 @@ function SolicitudForm({
               onChange={handleChange}
               className="form-select"
               required
+              disabled={isFormDisabled}
             >
               <option value="">Seleccioná una opción</option>
               {prioridadOptions.map((option) => (
@@ -627,6 +633,7 @@ function SolicitudForm({
               onChange={handleChange}
               className="form-select"
               required
+              disabled={isFormDisabled}
             >
               <option value="">Seleccioná una opción</option>
               {areaOptions.map((option) => (
@@ -662,6 +669,7 @@ function SolicitudForm({
                 selectedTipoSolicitud === 'Reportar incidencia' ||
                 selectedTipoSolicitud === 'Mantenimiento' ||
                 selectedTipoSolicitud === 'Solicitar baja'}
+              disabled={isFormDisabled}
             />
           </div>
 
@@ -685,7 +693,7 @@ function SolicitudForm({
                   selectedTipoSolicitud === 'Reportar incidencia' ||
                   selectedTipoSolicitud === 'Mantenimiento' ||
                   selectedTipoSolicitud === 'Solicitar baja') ? 'form-select-readonly' : ''}`}
-                disabled={selectedTipoSolicitud === 'Asignar línea disponible' ||
+                disabled={isFormDisabled || selectedTipoSolicitud === 'Asignar línea disponible' ||
                   selectedTipoSolicitud === 'Reasignar línea' || 
                   selectedTipoSolicitud === 'Reportar incidencia' ||
                   selectedTipoSolicitud === 'Mantenimiento' ||
@@ -718,6 +726,7 @@ function SolicitudForm({
                 className="form-select"
                 placeholder="Ingresá el nombre del nuevo propietario de la línea"
                 required
+                disabled={isFormDisabled}
               />
             </div>
             <div className="form-group">
@@ -730,7 +739,7 @@ function SolicitudForm({
                 value={formData.Tipo_de_chip}
                 onChange={handleChange}
                 className="form-select form-select-readonly"
-                disabled
+                disabled={isFormDisabled || true}
               >
                 <option value="">Seleccioná un tipo de chip</option>
                 {tipoChipOptions && tipoChipOptions.length > 0 ? (
@@ -761,6 +770,7 @@ function SolicitudForm({
                 onChange={handleChange}
                 className="form-select"
                 required
+                disabled={isFormDisabled}
               >
                 <option value="">Seleccioná un proveedor</option>
                 {proveedorOptions.map((option) => (
@@ -780,6 +790,7 @@ function SolicitudForm({
                 value={formData.Tipo_de_chip}
                 onChange={handleChange}
                 className="form-select"
+                disabled={isFormDisabled}
               >
                 <option value="">Seleccioná un tipo de chip</option>
                 {tipoChipOptions && tipoChipOptions.length > 0 ? (
@@ -811,7 +822,7 @@ function SolicitudForm({
                 value={formData.Tipo_de_chip}
                 onChange={handleChange}
                 className="form-select form-select-readonly"
-                disabled
+                disabled={isFormDisabled || true}
               >
                 <option value="">Seleccioná un tipo de chip</option>
                 {tipoChipOptions && tipoChipOptions.length > 0 ? (
@@ -841,6 +852,7 @@ function SolicitudForm({
               rows="3"
               placeholder="Indicá por qué se reasigna esta línea"
               required
+              disabled={isFormDisabled}
             />
           </div>
         )}
@@ -857,6 +869,7 @@ function SolicitudForm({
             className="form-textarea"
             rows="4"
             placeholder="Describe la necesidad de la solicitud, contexto y responsables..."
+            disabled={isFormDisabled}
           />
         </div>
 
@@ -870,6 +883,7 @@ function SolicitudForm({
                 checked={!!formData.Notificar_el_pedido}
                 onChange={handleChange}
                 className="form-checkbox"
+                disabled={isFormDisabled}
               />
               <span>Notificar el pedido</span>
             </label>
@@ -902,7 +916,7 @@ function SolicitudForm({
             <button
               type="submit"
               className={`btn btn-primary ${solicitudType}`}
-              disabled={loading || !isFormValid}
+              disabled={loading || !isFormValid || isFormDisabled}
             >
               {loading
                 ? 'Procesando...'
