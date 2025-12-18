@@ -101,6 +101,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
+  align-items: start;
 }
 
 
@@ -117,6 +118,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  min-height: 22px;
+  line-height: 1.4;
 }
 
 .label-icon {
@@ -502,3 +505,85 @@
   }
 }
 
+/* Estilos para la sección de detalles adicionales de incidencias, mantenimiento y baja */
+.incidencia-details-section {
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+  border: 2px solid #ffcc80;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.1);
+}
+
+.incidencia-section-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ffcc80;
+}
+
+.incidencia-section-title {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #e65100;
+}
+
+.incidencia-section-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #f57c00;
+  font-style: italic;
+}
+
+.incidencia-details-section .form-row {
+  margin-bottom: 16px;
+}
+
+.incidencia-details-section .form-group {
+  margin-bottom: 16px;
+}
+
+.incidencia-details-section .form-group:last-child {
+  margin-bottom: 0;
+}
+/* Estilos para la sección de detalles adicionales de incidencias, mantenimiento y baja */
+.incidencia-details-section {
+  background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+  border: 2px solid #ffcc80;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.1);
+}
+
+.incidencia-section-header {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ffcc80;
+}
+
+.incidencia-section-title {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #e65100;
+}
+
+.incidencia-section-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #f57c00;
+  font-style: italic;
+}
+
+.incidencia-details-section .form-row {
+  margin-bottom: 16px;
+}
+
+.incidencia-details-section .form-group {
+  margin-bottom: 16px;
+}
+
+.incidencia-details-section .form-group:last-child {
+  margin-bottom: 0;
+}

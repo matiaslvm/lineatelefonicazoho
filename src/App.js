@@ -40,6 +40,7 @@ function App() {
   const [planOptions, setPlanOptions] = useState([]);
   const [proveedorOptions, setProveedorOptions] = useState([]);
   const [tipoChipOptions, setTipoChipOptions] = useState([]);
+  const [tipoIncidenciaOptions, setTipoIncidenciaOptions] = useState([]);
 
   /**
    * Ajusta el tamaño del widget usando la SDK oficial de Zoho
@@ -91,13 +92,14 @@ function App() {
   const fetchPicklistOptions = async () => {
     try {
       console.log('Iniciando carga de picklists...');
-      const [tipoSolicitud, prioridad, area, plan, proveedor, tipoChip] = await Promise.all([
+      const [tipoSolicitud, prioridad, area, plan, proveedor, tipoChip, tipoIncidencia] = await Promise.all([
         getPicklistValues(MODULE_NAME, 'Tipo_de_solicitud'),
         getPicklistValues(MODULE_NAME, 'Prioridad'),
         getPicklistValues(MODULE_NAME, 'Area'),
         getPicklistValues(MODULE_NAME, 'Plan'),
         getPicklistValues(MODULE_NAME, 'Empresa_Proveedor'),
-        getPicklistValues(MODULE_NAME, 'Tipo_de_Chip')
+        getPicklistValues(MODULE_NAME, 'Tipo_de_Chip'),
+        getPicklistValues(MODULE_NAME, 'Tipo_de_incidencia')
       ]);
       
       console.log('Picklists cargados:', {
@@ -122,6 +124,7 @@ function App() {
       setPlanOptions(plan);
       setProveedorOptions(proveedor);
       setTipoChipOptions(tipoChip);
+      setTipoIncidenciaOptions(tipoIncidencia);
     } catch (err) {
       console.error('Error al cargar opciones de picklists:', err);
       // Si falla la carga de Tipo_de_chip específicamente, intentar cargarlo por separado
@@ -361,12 +364,15 @@ function App() {
         const updateData = {
           Tipo_de_solicitud: selectedTipoSolicitud,
           Prioridad: formData.Prioridad || '',
-          Comentarios: formData.Comentarios,
+          Comentarios: formData.Comentarios || '',
           Area: formData.Area || '',
           Name: formData.Name,
           Plan: formData.Plan || '',
           Tipo_de_Chip: formData.Tipo_de_chip || '',
-          Notificar_el_pedido: !!formData.Notificar_el_pedido
+          Notificar_el_pedido: !!formData.Notificar_el_pedido,
+          // Campos adicionales de incidencia
+          Tipo_de_incidencia: formData.Tipo_de_incidencia || '',
+          Fecha_de_incidencia: formData.Fecha_de_incidencia || ''
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -382,12 +388,15 @@ function App() {
         const updateData = {
           Tipo_de_solicitud: selectedTipoSolicitud,
           Prioridad: formData.Prioridad || '',
-          Comentarios: formData.Comentarios,
+          Comentarios: formData.Comentarios || '',
           Area: formData.Area || '',
           Name: formData.Name,
           Plan: formData.Plan || '',
           Tipo_de_Chip: formData.Tipo_de_chip || '',
-          Notificar_el_pedido: !!formData.Notificar_el_pedido
+          Notificar_el_pedido: !!formData.Notificar_el_pedido,
+          // Campos adicionales de mantenimiento
+          Tipo_incidencia: formData.Tipo_incidencia || '',
+          Fecha_inicio: formData.Fecha_inicio || ''
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -408,11 +417,15 @@ function App() {
         const updateData = {
           Tipo_de_solicitud: selectedTipoSolicitud,
           Prioridad: formData.Prioridad || '',
-          Comentarios: formData.Comentarios,
+          Comentarios: formData.Comentarios || '',
           Area: formData.Area || '',
           Name: formData.Name,
           Plan: formData.Plan || '',
-          Tipo_de_chip: formData.Tipo_de_chip || ''
+          Tipo_de_chip: formData.Tipo_de_chip || '',
+          Notificar_el_pedido: !!formData.Notificar_el_pedido,
+          // Campos adicionales de solicitud de baja
+          Tipo_incidencia: formData.Tipo_incidencia || '',
+          Fecha_inicio: formData.Fecha_inicio || ''
         };
 
         await updateRecord(MODULE_NAME, lineaSeleccionada.id, updateData);
@@ -520,6 +533,7 @@ function App() {
                   planOptions={planOptions}
                   proveedorOptions={proveedorOptions}
                   tipoChipOptions={tipoChipOptions}
+                  tipoIncidenciaOptions={tipoIncidenciaOptions}
                   onSubmit={handleCreateSolicitud}
                   onCancel={handleCancelForm}
                   loading={submitting}

@@ -5,6 +5,25 @@ import './SolicitudForm.css';
  * Componente para crear una solicitud usando campos reales del CRM
  * Campos: Tipo_de_solicitud, Prioridad, Comentarios, Area, Linea
  */
+
+// Estado inicial del formulario (fuera del componente para evitar recreación)
+const getInitialFormState = () => ({
+  Prioridad: '',
+  Comentarios: '',
+  Area: '',
+  Plan: '',
+  Name: '',
+  Linea: '',
+  Empresa_Proveedor: '',
+  Tipo_de_chip: '',
+  Motivo_de_reasignaci_n: '',
+  Propietario_nuevo: '',
+  Notificar_el_pedido: true,
+  // Campos adicionales para incidencias, mantenimiento y baja
+  Tipo_de_incidencia: '',
+  Fecha_de_incidencia: ''
+});
+
 function SolicitudForm({
   selectedProject,
   projectStats,
@@ -17,31 +36,18 @@ function SolicitudForm({
   planOptions = [],
   proveedorOptions = [],
   tipoChipOptions = [],
+  tipoIncidenciaOptions = [],
   onSubmit,
   onCancel,
   loading,
   lastRecordId,
   onOpenLastRecord
 }) {
-  const initialFormState = {
-    Prioridad: '',
-    Comentarios: '',
-    Area: '',
-    Plan: '',
-    Name: '',
-    Linea: '',
-    Empresa_Proveedor: '',
-    Tipo_de_chip: '',
-    Motivo_de_reasignaci_n: '',
-    Propietario_nuevo: '',
-    Notificar_el_pedido: true
-  };
-
-  const [formData, setFormData] = useState(initialFormState);
+  const [formData, setFormData] = useState(getInitialFormState());
 
   // Cada vez que cambia el proyecto o la disponibilidad, reseteamos el formulario
   useEffect(() => {
-    setFormData(initialFormState);
+    setFormData(getInitialFormState());
   }, [selectedProject, availabilityStatus, selectedTipoSolicitud]);
 
   const handleChange = (e) => {
@@ -457,13 +463,23 @@ function SolicitudForm({
   
   const requierePropietarioNuevo = tipoNorm.includes('reasignar');
   
+  // Campos adicionales requeridos para incidencias, mantenimiento y baja
+  const requiereCamposAdicionales = 
+    tipoNorm.includes('incidencia') || 
+    tipoNorm.includes('mantenimiento') || 
+    tipoNorm.includes('baja');
+  
+  const camposAdicionalesValidos = !requiereCamposAdicionales || 
+    (formData.Tipo_de_incidencia && formData.Fecha_de_incidencia && formData.Comentarios);
+  
   const isFormValid =
     isFormBaseValid &&
     (!requiereLineaYDisponible || formData.Linea) &&
     (!requierePlan || formData.Plan) &&
     (!requiereProveedor || formData.Empresa_Proveedor) &&
     (!requiereMotivoReasignacion || formData.Motivo_de_reasignaci_n) &&
-    (!requierePropietarioNuevo || formData.Propietario_nuevo);
+    (!requierePropietarioNuevo || formData.Propietario_nuevo) &&
+    camposAdicionalesValidos;
 
   // Si no hay tipo de solicitud seleccionado, mostrar estado inicial
   if (!selectedTipoSolicitud) {
@@ -857,21 +873,110 @@ function SolicitudForm({
           </div>
         )}
 
-        <div className="form-group">
-          <label htmlFor="Comentarios" className="form-label">
-            Comentarios adicionales
-          </label>
-          <textarea
-            id="Comentarios"
-            name="Comentarios"
-            value={formData.Comentarios}
-            onChange={handleChange}
-            className="form-textarea"
-            rows="4"
-            placeholder="Describe la necesidad de la solicitud, contexto y responsables..."
-            disabled={isFormDisabled}
-          />
-        </div>
+        {/* Sección de campos adicionales para incidencias, mantenimiento y baja */}
+        {(selectedTipoSolicitud === 'Reportar incidencia' ||
+          selectedTipoSolicitud === 'Mantenimiento' ||
+          selectedTipoSolicitud === 'Solicitar baja') && (
+          <div className="incidencia-details-section">
+            <div className="incidencia-section-header">
+              <h4 className="incidencia-section-title">
+                {selectedTipoSolicitud === 'Reportar incidencia' && '📋 Detalles de la incidencia'}
+                {selectedTipoSolicitud === 'Mantenimiento' && '🔧 Detalles del mantenimiento'}
+                {selectedTipoSolicitud === 'Solicitar baja' && '📝 Detalles de la solicitud de baja'}
+              </h4>
+              <p className="incidencia-section-subtitle">
+                Completá la información detallada para tener un registro completo
+              </p>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="Tipo_de_incidencia" className="form-label">
+                  {selectedTipoSolicitud === 'Reportar incidencia' && 'Tipo de incidencia'}
+                  {selectedTipoSolicitud === 'Mantenimiento' && 'Tipo de mantenimiento'}
+                  {selectedTipoSolicitud === 'Solicitar baja' && 'Tipo de solicitud'}
+                  {' '}
+                  <span className="required">*</span>
+                </label>
+                <select
+                  id="Tipo_de_incidencia"
+                  name="Tipo_de_incidencia"
+                  value={formData.Tipo_de_incidencia}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                  disabled={isFormDisabled}
+                >
+                  <option value="">Seleccioná una opción</option>
+                  {tipoIncidenciaOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="Fecha_de_incidencia" className="form-label">
+                  Fecha de incidencia <span className="required">*</span>
+                </label>
+                <input
+                  id="Fecha_de_incidencia"
+                  name="Fecha_de_incidencia"
+                  type="date"
+                  value={formData.Fecha_de_incidencia}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
+                  disabled={isFormDisabled}
+                  max={new Date().toISOString().split('T')[0]}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="Comentarios" className="form-label">
+                Comentarios adicionales <span className="required">*</span>
+              </label>
+              <textarea
+                id="Comentarios"
+                name="Comentarios"
+                value={formData.Comentarios}
+                onChange={handleChange}
+                className="form-textarea"
+                rows={5}
+                placeholder={
+                  selectedTipoSolicitud === 'Reportar incidencia'
+                    ? 'Describí la incidencia en detalle: síntomas, causa, pasos realizados, impacto, etc.'
+                    : selectedTipoSolicitud === 'Mantenimiento'
+                    ? 'Detallá el mantenimiento requerido: qué se necesita hacer, materiales, duración, técnico asignado, etc.'
+                    : 'Explicá los detalles de la solicitud de baja: motivo específico, fecha deseada, proceso de migración, etc.'
+                }
+                required
+                disabled={isFormDisabled}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Campo de comentarios para otros tipos de solicitud */}
+        {!['Reportar incidencia', 'Mantenimiento', 'Solicitar baja'].includes(selectedTipoSolicitud) && (
+          <div className="form-group">
+            <label htmlFor="Comentarios" className="form-label">
+              Comentarios adicionales
+            </label>
+            <textarea
+              id="Comentarios"
+              name="Comentarios"
+              value={formData.Comentarios}
+              onChange={handleChange}
+              className="form-textarea"
+              rows={4}
+              placeholder="Describe la necesidad de la solicitud, contexto y responsables..."
+              disabled={isFormDisabled}
+            />
+          </div>
+        )}
 
         <div className="form-actions">
           <div className="form-actions-left">
